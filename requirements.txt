@@ -5,7 +5,7 @@
 PyQt5
 
 # Development tools (like pyuic5 to convert .ui files)
-pyqt5-devtools
+pyqt5-tools
 
 # ----------------------------------
 # PACKAGING & DISTRIBUTION
