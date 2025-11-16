@@ -11,6 +11,7 @@ $FOURTH STEP: When you virtual environment is successfully activated, do "pip in
 
 
 #To convert pyqt5 designer file do: Open CMD -> "pyuic5 -x your_file.ui -o your_output_file.py"
+#To open QT Designer, navigate to "[YOURPATH]\GitHub\ScrollTravel-PROJECT\venv\Lib\site-packages\qt5_applications\Qt\bin" and look for "designer.exe".
 #Note: It is required to activate your virtual environment first everytime you start working on the project.
 #If you have any questions or in need for help please text other members in the group chat!
 Thanks for reading.
