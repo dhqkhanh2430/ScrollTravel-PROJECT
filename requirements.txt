@@ -1,0 +1,32 @@
+# ----------------------------------
+# GUI FRAMEWORK
+# ----------------------------------
+# The main PyQt5 framework
+PyQt5
+
+# Development tools (like pyuic5 to convert .ui files)
+pyqt5-devtools
+
+# ----------------------------------
+# PACKAGING & DISTRIBUTION
+# ----------------------------------
+# To bundle your app into a standalone .exe or .app
+PyInstaller
+
+# ----------------------------------
+# COMMON UTILITIES
+# ----------------------------------
+# For making HTTP requests (e.g., to APIs)
+requests
+
+# For image processing (opening, editing, saving images)
+Pillow
+
+# For loading environment variables from a .env file (good for API keys)
+python-dotenv
+
+# ----------------------------------
+# STYLING (OPTIONAL BUT RECOMMENDED)
+# ----------------------------------
+# A popular dark/light stylesheet for a modern look
+qdarkstyle
