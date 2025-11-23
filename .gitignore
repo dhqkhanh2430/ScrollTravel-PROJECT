@@ -5,3 +5,10 @@ __pycache__/
 
 # Sensitive Info
 .env
+
+venv/
+env/
+.env
+
+.vscode/
+.idea/
