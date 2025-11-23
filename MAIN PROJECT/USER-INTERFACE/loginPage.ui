@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>699</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">#centralwidget {
+    /* Chú ý dấu hai chấm :/ ở đầu - Đây là cú pháp của QRC */
+    border-image: url(:/newPrefix/background.jpg) 0 0 0 0 stretch stretch;
+}</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="3" column="1">
+     <spacer name="verticalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>146</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="0" column="1">
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>67</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="1" column="0">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>182</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="2" column="2">
+     <spacer name="horizontalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>182</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="1" column="1" rowspan="2">
+     <widget class="QFrame" name="frame">
+      <property name="minimumSize">
+       <size>
+        <width>400</width>
+        <height>450</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>400</width>
+        <height>450</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QFrame {
+    background-color: #fdfbf7; /* Màu trắng ngà/kem */
+    border-radius: 20px;
+    border: 1px solid #dcdde1;
+}</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblLogo">
+           <property name="minimumSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel#lblLogo {
+    background-color: #dfe6e9; /* Màu xám nhạt giả lập khung ảnh */
+    color: #636e72;            /* Màu chữ xám đậm */
+    font-weight: bold;
+    font-size: 20px;           
+    border-radius: 40px;       /* = 1/2 kích thước (80px) để biến thành HÌNH TRÒN */
+    border: 2px dashed #b2bec3; /* Viền nét đứt (kí hiệu &quot;chỗ này đang trống&quot;) */
+}</string>
+           </property>
+           <property name="text">
+            <string>ICON</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblTitle">
+         <property name="styleSheet">
+          <string notr="true">QLabel#lblTitle {
+	border: none;
+    font-size: 15px;           /* Chữ to rõ */
+    font-weight: bold;         /* In đậm */
+    color: #2c3e50;            /* Màu xanh đen sang trọng */
+    font-family: &quot;Segoe UI&quot;;   /* Font hiện đại (có thể đổi thành Arial) */
+    margin-bottom: 20px;       /* Tạo khoảng cách với ô Username bên dưới */
+}
+</string>
+         </property>
+         <property name="text">
+          <string>WELCOME TO SCROLLTRAVEL!</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="leftMargin">
+          <number>44</number>
+         </property>
+         <property name="rightMargin">
+          <number>44</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="usernameINPUT">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="baseSize">
+            <size>
+             <width>180</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit {
+    border: 1px solid #555555; /* Viền màu xám, dày 2px */
+    border-radius: 10px;       /* Độ bo tròn (số càng lớn càng tròn) */
+    padding-left: 10px;        /* Đệm trái để chữ không sát mép */
+    padding-right: 10px;       /* Đệm phải */
+    background-color:  #e0ffff ; /* Màu nền */
+    color: black;              /* Màu chữ */
+	padding: 12px;
+
+}
+
+/* Hiệu ứng khi bấm chuột vào */
+QLineEdit:focus {
+    border: 1px solid #00aaff; /* Đổi màu viền sang xanh dương */
+}
+
+</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+           <property name="placeholderText">
+            <string notr="true">Username</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox">
+         <property name="styleSheet">
+          <string notr="true">QGroupBox {
+    border: none;    
+    margin-top: 0px; 
+}</string>
+         </property>
+         <property name="title">
+          <string/>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLineEdit" name="paswordINPUT">
+            <property name="minimumSize">
+             <size>
+              <width>200</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="baseSize">
+             <size>
+              <width>180</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QLineEdit {
+    border: 1px solid #555555; /* Viền màu xám, dày 2px */
+    border-radius: 10px;       /* Độ bo tròn (số càng lớn càng tròn) */
+    padding-left: 10px;        /* Đệm trái để chữ không sát mép */
+    padding-right: 10px;       /* Đệm phải */
+    background-color:  #e0ffff ; /* Màu nền */
+    color: black;              /* Màu chữ */
+	padding: 12px;
+	margin-left: 34px;
+}
+
+/* Hiệu ứng khi bấm chuột vào */
+QLineEdit:focus {
+    border: 1px solid #00aaff; /* Đổi màu viền sang xanh dương */
+}
+
+QLineEdit::placeholderText{
+	color: #000000;
+	front-style: italic;
+	font-weight: normal;
+}</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+            </property>
+            <property name="placeholderText">
+             <string notr="true">Password</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton">
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
+    background-color: transparent; /* Nền trong suốt */
+    border: none;                  /* Không viền */
+    font-size: 20px;               /* Chữ to ra cho dễ bấm */
+    color: #3498db;                /* Màu xanh */
+}
+QPushButton:hover {
+    color: #2980b9;                /* Đổi màu khi di chuột */
+}</string>
+            </property>
+            <property name="text">
+             <string>👁</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>4</number>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="styleSheet">
+            <string notr="true">/* Trạng thái bình thường: Trong suốt, không viền */
+QLabel {
+    background-color: transparent; /* Nền trong suốt */
+    border: none;                  /* Bỏ viền */
+    color: #d3d3d3;                /* Màu xanh link (giống web) */
+    font-size: 14px;
+    text-align: left;              /* Canh trái (hoặc center tùy bạn) */
+}
+</string>
+           </property>
+           <property name="text">
+            <string>Don't have ann account yet? Create one</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_2">
+           <property name="styleSheet">
+            <string notr="true">/* Trạng thái bình thường: Trong suốt, không viền */
+QPushButton {
+    background-color: transparent; /* Nền trong suốt */
+    border: none;                  /* Bỏ viền */
+    color: #3498db;                /* Màu xanh link (giống web) */
+    font-size: 14px;
+    text-align: left;              /* Canh trái (hoặc center tùy bạn) */
+}
+
+/* Khi di chuột vào: Gạch chân và đổi màu đậm hơn */
+QPushButton:hover {
+    color: #1d72b8;                /* Xanh đậm hơn */
+    text-decoration: underline;    /* Gạch chân (đây là mấu chốt) */
+}
+
+/* Khi bấm xuống */
+QPushButton:pressed {
+    color: #155a8a;
+}</string>
+           </property>
+           <property name="text">
+            <string>here</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <property name="leftMargin">
+          <number>100</number>
+         </property>
+         <property name="rightMargin">
+          <number>100</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="loginBUTTON">
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">/* --- TRẠNG THÁI BÌNH THƯỜNG --- */
+QPushButton {
+    background-color: #2980b9; /* Màu xanh dương (Màu nền chính) */
+    color: white;              /* Màu chữ */
+    font-weight: bold;         /* Chữ đậm */
+    font-size: 8px;           /* Cỡ chữ */
+    border-radius: 10px;       /* Bo tròn góc */
+    padding: 10px;             /* Khoảng cách đệm để nút to ra */
+    border: none;              /* Xóa viền xấu xí mặc định */
+	margin-top: 8px;
+	margin-bottom: 20px;
+}
+
+/* --- KHI DI CHUỘT VÀO (HOVER) --- */
+QPushButton:hover {
+    background-color: #3498db; /* Đổi sang màu xanh sáng hơn */
+}
+
+/* --- KHI BẤM GIỮ CHUỘT (PRESSED) --- */
+QPushButton:pressed {
+    background-color: #1f618d; /* Đổi sang màu tối hơn (cảm giác nút lún xuống) */
+    padding-top: 12px;         /* (Mẹo) Dịch chữ xuống 1 xíu tạo cảm giác nhấn thật */
+    padding-left: 12px;
+}</string>
+           </property>
+           <property name="text">
+            <string>Login</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../ASSETS/LOGIN-PAGE/res.qrc"/>
+ </resources>
+ <connections/>
+</ui>
