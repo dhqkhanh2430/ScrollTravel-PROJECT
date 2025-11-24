@@ -1,5 +1,6 @@
 <RCC>
-  <qresource prefix="newPrefix">
+  <qresource prefix="Login">
     <file>background.jpg</file>
+    <file>logo.png</file>
   </qresource>
 </RCC>
