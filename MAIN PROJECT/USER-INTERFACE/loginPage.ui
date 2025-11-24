@@ -178,7 +178,7 @@
 </string>
          </property>
          <property name="text">
-          <string>WELCOME TO SCROLLTRAVEL!</string>
+          <string>LOGIN TO YOUR ACCOUNT</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -453,7 +453,7 @@ QPushButton:pressed {
  </widget>
  <resources>
   <include location="../ASSETS/res.qrc"/>
-  <include location="../ASSETS/LOGIN-PAGE/res.qrc"/>
+  <include location="../ASSETS/res.qrc"/>
  </resources>
  <connections/>
 </ui>
