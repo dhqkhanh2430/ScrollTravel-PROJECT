@@ -3,4 +3,5 @@
     <file>background.jpg</file>
     <file>logo.png</file>
   </qresource>
+  <qresource prefix="Registration"/>
 </RCC>
