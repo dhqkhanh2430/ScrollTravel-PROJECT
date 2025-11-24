@@ -3,5 +3,8 @@
     <file>background.jpg</file>
     <file>logo.png</file>
   </qresource>
-  <qresource prefix="Registration"/>
+  <qresource prefix="Registration">
+    <file>logo.png</file>
+    <file>background2.jpg</file>
+  </qresource>
 </RCC>
