@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>807</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(228, 250, 251);</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>29</x>
+      <y>29</y>
+      <width>300</width>
+      <height>400</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QWidget{
+	background-color: rgb(114, 199, 255);
+    border-radius: 25px;
+    border: 2px solid #555555; /* Viền màu xám, dày 2px */
+}</string>
+    </property>
+    <widget class="QPushButton" name="pushButton_10">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>10</y>
+       <width>120</width>
+       <height>120</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton{
+	border: rgb(114, 199, 255);
+}</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>../ASSETS/Profile icon.png</normaloff>../ASSETS/Profile icon.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>100</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="textEdit">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>160</y>
+       <width>200</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QTextEdit{
+	background-color: #ffffff;
+	padding-left: 10px;        /* Đệm trái để chữ không sát mép */
+    padding-right: 10px;       /* Đệm phải */
+    color: black;              /* Màu chữ */
+
+}
+
+/* Hiệu ứng khi bấm chuột vào */
+QTextEdit:focus {
+    border: 1px solid #00aaff; /* Đổi màu viền sang xanh dương */
+}
+
+</string>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="textEdit_2">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>230</y>
+       <width>200</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QTextEdit{
+	background-color: #ffffff;
+	padding-left: 10px;        /* Đệm trái để chữ không sát mép */
+    padding-right: 10px;       /* Đệm phải */
+    color: black;              /* Màu chữ */
+
+}
+
+/* Hiệu ứng khi bấm chuột vào */
+QTextEdit:focus {
+    border: 1px solid #00aaff; /* Đổi màu viền sang xanh dương */
+}
+
+</string>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="textEdit_3">
+     <property name="geometry">
+      <rect>
+       <x>50</x>
+       <y>300</y>
+       <width>200</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QTextEdit{
+	background-color: #ffffff;
+	padding-left: 10px;        /* Đệm trái để chữ không sát mép */
+    padding-right: 10px;       /* Đệm phải */
+    color: black;              /* Màu chữ */
+
+}
+
+/* Hiệu ứng khi bấm chuột vào */
+QTextEdit:focus {
+    border: 1px solid #00aaff; /* Đổi màu viền sang xanh dương */
+}
+
+</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>130</y>
+       <width>113</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QLineEdit{
+	border: rgb(85, 170, 255);
+}</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
