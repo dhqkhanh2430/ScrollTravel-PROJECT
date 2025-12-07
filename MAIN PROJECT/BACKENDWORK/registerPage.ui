@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>799</width>
+    <height>837</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,19 +20,6 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="0">
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>182</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
     <item row="0" column="1">
      <spacer name="verticalSpacer">
       <property name="orientation">
@@ -46,44 +33,24 @@
       </property>
      </spacer>
     </item>
-    <item row="4" column="1">
-     <spacer name="verticalSpacer_2">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>32</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="2" column="2">
-     <spacer name="horizontalSpacer_2">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>182</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
     <item row="1" column="1" rowspan="2">
      <widget class="QFrame" name="frame">
       <property name="minimumSize">
        <size>
-        <width>400</width>
-        <height>500</height>
+        <width>450</width>
+        <height>600</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>400</width>
-        <height>500</height>
+        <width>800</width>
+        <height>1000</height>
+       </size>
+      </property>
+      <property name="baseSize">
+       <size>
+        <width>450</width>
+        <height>600</height>
        </size>
       </property>
       <property name="styleSheet">
@@ -187,7 +154,7 @@
           <number>30</number>
          </property>
          <item>
-          <widget class="QLineEdit" name="emailINPUT">
+          <widget class="QLineEdit" name="usernameINPUT">
            <property name="minimumSize">
             <size>
              <width>200</width>
@@ -224,6 +191,47 @@ QLineEdit:focus {
            </property>
            <property name="placeholderText">
             <string notr="true">Username</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="phoneINPUT">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="baseSize">
+            <size>
+             <width>180</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit {
+    border: 1px solid #555555; /* Viền màu xám, dày 2px */
+    border-radius: 10px;       /* Độ bo tròn (số càng lớn càng tròn) */
+    padding-left: 10px;        /* Đệm trái để chữ không sát mép */
+    padding-right: 10px;       /* Đệm phải */
+    background-color:  #e0ffff ; /* Màu nền */
+    color: black;              /* Màu chữ */
+	padding: 12px;
+
+}
+
+/* Hiệu ứng khi bấm chuột vào */
+QLineEdit:focus {
+    border: 1px solid #00aaff; /* Đổi màu viền sang xanh dương */
+}
+
+</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+           </property>
+           <property name="placeholderText">
+            <string notr="true">Phone number</string>
            </property>
           </widget>
          </item>
@@ -269,47 +277,6 @@ QLineEdit:focus {
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="usernameINPUT_4">
-           <property name="minimumSize">
-            <size>
-             <width>200</width>
-             <height>20</height>
-            </size>
-           </property>
-           <property name="baseSize">
-            <size>
-             <width>180</width>
-             <height>20</height>
-            </size>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QLineEdit {
-    border: 1px solid #555555; /* Viền màu xám, dày 2px */
-    border-radius: 10px;       /* Độ bo tròn (số càng lớn càng tròn) */
-    padding-left: 10px;        /* Đệm trái để chữ không sát mép */
-    padding-right: 10px;       /* Đệm phải */
-    background-color:  #e0ffff ; /* Màu nền */
-    color: black;              /* Màu chữ */
-	padding: 12px;
-
-}
-
-/* Hiệu ứng khi bấm chuột vào */
-QLineEdit:focus {
-    border: 1px solid #00aaff; /* Đổi màu viền sang xanh dương */
-}
-
-</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-           </property>
-           <property name="placeholderText">
-            <string notr="true">Phone number</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QLineEdit" name="retypePasswordInput">
            <property name="minimumSize">
             <size>
@@ -351,7 +318,7 @@ QLineEdit:focus {
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="usernameINPUT">
+          <widget class="QLineEdit" name="emailINPUT">
            <property name="minimumSize">
             <size>
              <width>200</width>
@@ -473,26 +440,28 @@ QPushButton:pressed {
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="leftMargin">
+          <number>100</number>
+         </property>
+         <property name="topMargin">
+          <number>20</number>
+         </property>
+         <property name="rightMargin">
+          <number>100</number>
+         </property>
          <item>
-          <spacer name="horizontalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="loginBUTTON">
+          <widget class="QPushButton" name="registerBUTTON">
            <property name="minimumSize">
             <size>
              <width>200</width>
-             <height>60</height>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="baseSize">
+            <size>
+             <width>220</width>
+             <height>50</height>
             </size>
            </property>
            <property name="styleSheet">
@@ -526,23 +495,49 @@ QPushButton:pressed {
            </property>
           </widget>
          </item>
-         <item>
-          <spacer name="horizontalSpacer_4">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
         </layout>
        </item>
       </layout>
      </widget>
+    </item>
+    <item row="2" column="2">
+     <spacer name="horizontalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>182</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="3" column="1">
+     <spacer name="verticalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>32</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="1" column="0">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>182</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
     </item>
    </layout>
   </widget>

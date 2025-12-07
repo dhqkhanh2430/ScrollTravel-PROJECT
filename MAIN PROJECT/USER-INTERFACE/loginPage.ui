@@ -101,7 +101,7 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <layout class="QHBoxLayout" name="logoLayout">
          <property name="bottomMargin">
           <number>10</number>
          </property>
@@ -186,7 +186,7 @@
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <layout class="QHBoxLayout" name="usernameInputLayout">
          <property name="leftMargin">
           <number>44</number>
          </property>
@@ -237,7 +237,7 @@ QLineEdit:focus {
         </layout>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox">
+        <widget class="QGroupBox" name="passwordLayout">
          <property name="styleSheet">
           <string notr="true">QGroupBox {
     border: none;    
@@ -294,7 +294,7 @@ QLineEdit::placeholderText{
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="showPasswordBt">
             <property name="styleSheet">
              <string notr="true">QPushButton {
     background-color: transparent; /* Nền trong suốt */
@@ -318,7 +318,7 @@ QPushButton:hover {
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <layout class="QHBoxLayout" name="reminderLayout_log">
          <property name="spacing">
           <number>4</number>
          </property>
@@ -354,7 +354,7 @@ QLabel {
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_2">
+          <widget class="QPushButton" name="toRegisterBt">
            <property name="styleSheet">
             <string notr="true">/* Trạng thái bình thường: Trong suốt, không viền */
 QPushButton {
@@ -397,7 +397,7 @@ QPushButton:pressed {
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <layout class="QHBoxLayout" name="loginBtLayout">
          <property name="leftMargin">
           <number>100</number>
          </property>
@@ -405,7 +405,7 @@ QPushButton:pressed {
           <number>100</number>
          </property>
          <item>
-          <widget class="QPushButton" name="loginBUTTON">
+          <widget class="QPushButton" name="loginBt">
            <property name="minimumSize">
             <size>
              <width>80</width>
