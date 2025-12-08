@@ -5,6 +5,7 @@ from PyQt5.QtGui import QPixmap
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 #this method pulls a random photo in the folder which name is the category of the object 
+#the main folder "images" is in ASSETS
 def random_qpixmap(folder):
     folder_path = os.path.join(BASE_DIR, folder)
 
@@ -65,3 +66,4 @@ class Location_Components:
             if pix:
 
                 self.label.setPixmap(pix)
+
