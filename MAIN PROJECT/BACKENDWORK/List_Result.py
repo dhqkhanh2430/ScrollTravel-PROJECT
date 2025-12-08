@@ -3,11 +3,13 @@ import random
 from PyQt5.QtGui import QPixmap
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(BASE_DIR)
+ASSETS_IMAGES_DIR = os.path.join(PROJECT_ROOT, "ASSETS", "images")
 
 #this method pulls a random photo in the folder which name is the category of the object 
 #the main folder "images" is in ASSETS
 def random_qpixmap(folder):
-    folder_path = os.path.join(BASE_DIR, folder)
+    folder_path = os.path.join(ASSETS_IMAGES_DIR, folder)
 
     files = os.listdir(folder_path)
     images = [f for f in files if f.lower().endswith((".png", ".jpg", ".jpeg"))]
@@ -66,4 +68,5 @@ class Location_Components:
             if pix:
 
                 self.label.setPixmap(pix)
+
 
