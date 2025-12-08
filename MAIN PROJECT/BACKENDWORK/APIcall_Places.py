@@ -1,6 +1,9 @@
 import requests
 import List_Result
 
+# ABSOLUTELY DO NOT LEAK THIS KEY
+# ABSOLUTELY DO NOT LEAK THIS KEY
+# ABSOLUTELY DO NOT LEAK THIS KEY
 API_KEY2 = "66edf8ecc8744a7baec8aedbfeca506f"
 
 # Hàm lấy input là tọa độ nơi khởi tạo tìm kiếm (Lấy từ Input_Classify nếu là thành phố), bán kính tìm kiếm (m), và loại hình giải trí
@@ -39,4 +42,5 @@ def getPlaces(lat, lon, radius, categories):
     except requests.exceptions.RequestException as e:
         return f"API call failed: {e}"
     except KeyError:
+
         return "Resp struct Error"
