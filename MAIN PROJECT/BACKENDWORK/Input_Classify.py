@@ -40,5 +40,3 @@ def cityCheck(query):
     else:
         return 0, 0
     
-#lat, lon = cityCheck("Ha Noi")
-#print(lat, lon)
