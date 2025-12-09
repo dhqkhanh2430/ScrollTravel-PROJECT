@@ -190,7 +190,7 @@ QLineEdit:focus {
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
            </property>
            <property name="placeholderText">
-            <string notr="true">Username</string>
+            <string notr="true">Tên đăng nhập</string>
            </property>
           </widget>
          </item>
@@ -231,7 +231,7 @@ QLineEdit:focus {
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
            </property>
            <property name="placeholderText">
-            <string notr="true">Phone number</string>
+            <string notr="true">Số điện thoại</string>
            </property>
           </widget>
          </item>
@@ -272,7 +272,7 @@ QLineEdit:focus {
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
            </property>
            <property name="placeholderText">
-            <string notr="true">Password</string>
+            <string notr="true">Mật khẩu (dài trên 6 ký tự, có ký tư đặc biệt, in hoa)</string>
            </property>
           </widget>
          </item>
@@ -313,7 +313,7 @@ QLineEdit:focus {
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
            </property>
            <property name="placeholderText">
-            <string notr="true">Retype Password</string>
+            <string notr="true">Nhập lại mật khẩu</string>
            </property>
           </widget>
          </item>
@@ -392,7 +392,7 @@ QLabel {
 </string>
            </property>
            <property name="text">
-            <string>Already have an account? Log in</string>
+            <string>Đã có tài khoản? Đăng nhập ở</string>
            </property>
           </widget>
          </item>
@@ -420,7 +420,7 @@ QPushButton:pressed {
 }</string>
            </property>
            <property name="text">
-            <string>here</string>
+            <string>đây</string>
            </property>
           </widget>
          </item>
@@ -491,7 +491,7 @@ QPushButton:pressed {
 }</string>
            </property>
            <property name="text">
-            <string>Register</string>
+            <string>Đăng nhập</string>
            </property>
           </widget>
          </item>

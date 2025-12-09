@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>699</height>
+    <height>674</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -178,7 +178,7 @@
 </string>
          </property>
          <property name="text">
-          <string>LOGIN TO YOUR ACCOUNT</string>
+          <string>ĐĂNG NHẬP VÀO TẢI KHOẢN</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -230,7 +230,7 @@ QLineEdit:focus {
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
            </property>
            <property name="placeholderText">
-            <string notr="true">Username</string>
+            <string notr="true">Tên đăng nhập</string>
            </property>
           </widget>
          </item>
@@ -289,7 +289,7 @@ QLineEdit::placeholderText{
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
             </property>
             <property name="placeholderText">
-             <string notr="true">Password</string>
+             <string notr="true">Mật khẩu</string>
             </property>
            </widget>
           </item>
@@ -349,7 +349,7 @@ QLabel {
 </string>
            </property>
            <property name="text">
-            <string>Don't have ann account yet? Create one</string>
+            <string>Chưa có tài khoản? Tạo một cái ở</string>
            </property>
           </widget>
          </item>
@@ -377,7 +377,7 @@ QPushButton:pressed {
 }</string>
            </property>
            <property name="text">
-            <string>here</string>
+            <string>đây</string>
            </property>
           </widget>
          </item>
@@ -439,7 +439,7 @@ QPushButton:pressed {
 }</string>
            </property>
            <property name="text">
-            <string>Login</string>
+            <string>Đăng nhập</string>
            </property>
           </widget>
          </item>

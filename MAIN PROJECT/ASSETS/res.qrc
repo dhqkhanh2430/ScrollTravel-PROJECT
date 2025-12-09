@@ -3,6 +3,10 @@
     <file>background.jpg</file>
     <file>logo.png</file>
   </qresource>
+  <qresource prefix="Profile">
+    <file>oguricapP.jpg</file>
+    <file>oguri cap.jpg</file>
+  </qresource>
   <qresource prefix="Registration">
     <file>logo.png</file>
     <file>background2.jpg</file>
