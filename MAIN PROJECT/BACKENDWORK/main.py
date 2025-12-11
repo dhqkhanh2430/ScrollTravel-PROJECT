@@ -1,7 +1,7 @@
 import sys
 import os
 import re
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtWidgets import QMessageBox
 
 #Import mấy cái file cần cho cái đống ở dưới
@@ -13,10 +13,11 @@ import data_manager
 def get_ui_path(filename):
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
 
-#Class Đổi mật khẩu
+
+#Class đổi mật khẩu
 class ChangePasswordWindow(QtWidgets.QMainWindow):
     def __init__(self, username, parent=None):
-        super().__init__(parent)  #parent giúp cửa sổ này luôn nằm trên cửa sổ cha
+        super().__init__(parent)
         try:
             uic.loadUi(get_ui_path("changePasswordWindow.ui"), self)
         except FileNotFoundError:
@@ -24,49 +25,90 @@ class ChangePasswordWindow(QtWidgets.QMainWindow):
 
         self.current_username = username
 
-        #Kết nối nút Xác nhận (Check tên nút trong Qt Designer nhé)
+        #Tự động dò tìm nút (fix lỗi nút không chạy)
         if hasattr(self, 'confirmChangeBtn'):
             self.confirmChangeBtn.clicked.connect(self.handle_change_password)
+        elif hasattr(self, 'confirmBtn'):
+            self.confirmBtn.clicked.connect(self.handle_change_password)
+        elif hasattr(self, 'pushButton'):
+            self.pushButton.clicked.connect(self.handle_change_password)
 
-        #Kết nối nút Quay về
         if hasattr(self, 'goBackBtn'):
             self.goBackBtn.clicked.connect(self.close)
+        elif hasattr(self, 'backBtn'):
+            self.backBtn.clicked.connect(self.close)
 
     def handle_change_password(self):
         try:
-            current_pass = self.currentPasswordInput.text()
-            new_pass = self.newPasswordInput.text()
-            retype_new = self.retypeNewPasswordInput.text()
+            #Lấy dữ liệu an toàn
+            current_pass = getattr(self, 'currentPasswordInput', None)
+            new_pass = getattr(self, 'newPasswordInput', None)
+            retype_new = getattr(self, 'retypeNewPasswordInput', None)
 
-            has_upper = any(char.isupper() for char in new_pass)
-            has_digit = any(char.isdigit() for char in new_pass)
-            has_special = any(not char.isalnum() for char in new_pass)
+            if not current_pass: return
 
-            if not current_pass or not new_pass:
+            curr_text = current_pass.text()
+            new_text = new_pass.text()
+            retype_text = retype_new.text()
+
+            #Logic kiểm tra
+            if not curr_text or not new_text:
                 QMessageBox.warning(self, "Thiếu thông tin", "Vui lòng nhập đầy đủ!")
                 return
-            if not (has_upper and has_digit and has_special):
-                QMessageBox.warning(self, "Lỗi", "Mật khẩu mới không đúng định dạng")
-                return
-            if len(new_pass) < 6:
-                QMessageBox.warning(self, "Lỗi", "Mật khẩu mới không đúng định dạng")
-                return
 
-            if new_pass != retype_new:
+            has_upper = any(char.isupper() for char in new_text)
+            has_digit = any(char.isdigit() for char in new_text)
+            has_special = any(not char.isalnum() for char in new_text)
+
+            if len(new_text) < 6:
+                QMessageBox.warning(self, "Mật khẩu yếu", "Mật khẩu phải dài hơn 6 ký tự")
+                return
+            if not (has_upper and has_digit and has_special):
+                QMessageBox.warning(self, "Mật khẩu yếu", "Mật khẩu mới cần có chữ IN HOA, SỐ và KÝ TỰ ĐẶC BIỆT")
+                return
+            if new_text != retype_text:
                 QMessageBox.warning(self, "Lỗi", "Mật khẩu mới xác nhận không khớp!")
                 return
 
+            #Gọi Data Manager
+            if hasattr(data_manager, 'change_password'):
+                success, msg = data_manager.change_password(self.current_username, curr_text, new_text)
+                if success:
+                    QMessageBox.information(self, "Thành công", msg)
+                    self.close()
+                else:
+                    QMessageBox.warning(self, "Thất bại", msg)
+        except Exception as e:
+            QMessageBox.critical(self, "Lỗi Code", str(e))
 
-            #Gọi hàm xử lý trong data_manager
-            success, msg = data_manager.change_password(self.current_username, current_pass, new_pass)
 
-            if success:
-                QMessageBox.information(self, "Thành công", msg)
-                self.close()
-            else:
-                QMessageBox.warning(self, "Thất bại", msg)
-        except AttributeError:
-            QMessageBox.critical(self, "Lỗi UI", "Sai tên ô nhập liệu trong changePasswordWindow")
+#Class Menu
+class MenuScreen(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+        try:
+            uic.loadUi(get_ui_path("menuPage.ui"), self)
+        except FileNotFoundError:
+            print("CẢNH BÁO: Không tìm thấy file menuPage.ui. Hãy tạo nó trong Qt Designer!")
+
+        self.current_user_data = None  #Biến để giữ hộ thông tin user
+
+        #Nút profile để nhảy sang trang profil
+        if hasattr(self, 'profileBtn'):
+            self.profileBtn.clicked.connect(self.goto_profile)
+
+    def load_user_info(self, user_data):
+        #Hàm này nhận dữ liệu từ Login ném sang để giữ đó
+        self.current_user_data = user_data
+
+    def goto_profile(self):
+        #Khi bấm nút profile thì ném dữ liệu sang trang Profile và chuyển cảnh
+        if self.current_user_data:
+            profile_window.load_user_info(self.current_user_data)
+
+        #Chuyển sang màn hình Profile (Index 2)
+        widget.setCurrentIndex(2)
+
 
 #Class Profile
 class ProfileScreen(QtWidgets.QMainWindow):
@@ -79,6 +121,7 @@ class ProfileScreen(QtWidgets.QMainWindow):
 
         self.is_editing = False
         self.current_username = ""
+        self.change_pass_dialog = None
 
         try:
             self.editBtn.clicked.connect(self.toggle_edit_mode)
@@ -116,9 +159,12 @@ class ProfileScreen(QtWidgets.QMainWindow):
             self.phoneEdit.setText(user_data.get("Phone", ""))
 
         self.is_editing = False
+        self.editBtn.setText("Chỉnh sửa thông tin")
         self.set_fields_readonly(True)
-    def go_back(selfs):
-        widget.setCurrentIndex(0)
+
+    def go_back(self):
+        # Quay về trang Menu (Index 3)
+        widget.setCurrentIndex(3)
 
     #Hàm chỉnh sưa thông tin
     def set_fields_readonly(self, state):
@@ -126,7 +172,7 @@ class ProfileScreen(QtWidgets.QMainWindow):
         if hasattr(self, 'phoneEdit'): self.phoneEdit.setReadOnly(state)
 
         if hasattr(self, 'usernameEdit'): self.usernameEdit.setReadOnly(True)
-        #Cập nhật style cho người dùng nhận biết
+        # Cập nhật style cho người dùng nhận biết
         if state:
             style = """
                 QLineEdit {
@@ -179,7 +225,7 @@ class ProfileScreen(QtWidgets.QMainWindow):
             if success:
                 QMessageBox.information(self, "Thành công", msg)
                 self.is_editing = False
-                self.editBtn.setText("Chỉnh sửa")
+                self.editBtn.setText("Chỉnh sửa thông tin")
                 self.set_fields_readonly(True)
             else:
                 QMessageBox.critical(self, "Lỗi", msg)
@@ -188,14 +234,13 @@ class ProfileScreen(QtWidgets.QMainWindow):
         reply = QMessageBox.question(self, "Xác nhận đăng xuất", "Bạn có muốn đăng xuất khỏi tài khoản không?",
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
-            widget.setCurrentIndex(0)  #Quay về Login
+            widget.setCurrentIndex(0)  # Quay về Login
         else:
-            pass #giữ nguyên không làm gì
+            pass  # giữ nguyên không làm gì
 
-    def change_password(self, password):
+    def change_password(self):
         self.change_pass_dialog = ChangePasswordWindow(self.current_username, self)
         self.change_pass_dialog.show()
-
 
 
 #Class Login
@@ -212,7 +257,11 @@ class LoginScreen(QtWidgets.QMainWindow):
             self.toRegisterBt.clicked.connect(self.goto_register)
         except AttributeError:
             print("Lỗi UI: Không tìm thấy nút 'toRegisterBt' để chuyển trang.")
-        self.loginBt.clicked.connect(self.handle_login)
+
+        try:
+            self.loginBt.clicked.connect(self.handle_login)
+        except AttributeError:
+            print("Không có nút loginBt")
 
         try:
             if hasattr(self, 'showPasswordBt'):
@@ -250,9 +299,9 @@ class LoginScreen(QtWidgets.QMainWindow):
         user_data, message = data_manager.check_login(user, pwd)
 
         if user_data:
-            #đúng thì chuyển sang index 2 (menu)
-            profile_window.load_user_info(user_data)
-            widget.setCurrentIndex(2)
+            #đúng thì chuyển sang index 3 (MENU PAGE)
+            menu_window.load_user_info(user_data)  #Gửi dữ liệu cho Menu cầm
+            widget.setCurrentIndex(3)
         else:
             #Sai thì thông báo lỗi
             QMessageBox.warning(self, "Đăng nhập thất bại", message)
@@ -262,7 +311,7 @@ class LoginScreen(QtWidgets.QMainWindow):
         widget.setCurrentIndex(1)
 
 
-# Claas Register
+#Claas Register
 class RegisterScreen(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -286,13 +335,12 @@ class RegisterScreen(QtWidgets.QMainWindow):
             retype = self.retypePasswordInput.text()
             email = self.emailINPUT.text()
             phone = self.phoneINPUT.text()
-
             #Yêu cầu mẫu
-            email_valid = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$' #Định dạng email tiêu chuẩn
+            email_valid = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$'  # Định dạng email tiêu chuẩn
             #Định dạng mật khẩu tiêu chuẩn (phải có chữ in hoa
             #số và ký tự đặc biệt
-            has_upper  = any(char.isupper() for char in pwd)
-            has_digit  = any(char.isdigit() for char in pwd)
+            has_upper = any(char.isupper() for char in pwd)
+            has_digit = any(char.isdigit() for char in pwd)
             has_special = any(not char.isalnum() for char in pwd)
 
             #Logic kiểm tra
@@ -347,15 +395,17 @@ if __name__ == "__main__":
     #Tạo Stack chứa các màn hình
     widget = QtWidgets.QStackedWidget()
 
-    #Khởi tạo 3 màn hình
+    #Khởi tạo 4 màn hình (THÊM MENU)
     login_window = LoginScreen()  # Index 0
     register_window = RegisterScreen()  # Index 1
     profile_window = ProfileScreen()  # Index 2
+    menu_window = MenuScreen()  # Index 3
 
     #Thêm vào Stack
     widget.addWidget(login_window)
     widget.addWidget(register_window)
     widget.addWidget(profile_window)
+    widget.addWidget(menu_window)
 
     #Cấu hình cửa sổ
     widget.resize(860, 540)
