@@ -1,14 +1,12 @@
 # Python Virtual Environment
 venv/
+.venv/
 *.pyc
 __pycache__/
 
 # Sensitive Info
 .env
 
-venv/
-env/
-.env
-
+# IDE settings
 .vscode/
 .idea/
