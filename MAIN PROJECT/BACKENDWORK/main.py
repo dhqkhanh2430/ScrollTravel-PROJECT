@@ -1,8 +1,12 @@
 import sys
 import os
 import re
+import time
+import requests
 from PyQt5 import QtWidgets, uic, QtGui
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtCore import QTimer, QStringListModel, Qt, QThread, pyqtSignal
+from PyQt5.QtWidgets import QMessageBox, QCompleter
+
 
 #Import mấy cái file cần cho cái đống ở dưới
 import res
@@ -89,27 +93,97 @@ class MenuScreen(QtWidgets.QMainWindow):
         try:
             uic.loadUi(get_ui_path("menuPage.ui"), self)
         except FileNotFoundError:
-            print("CẢNH BÁO: Không tìm thấy file menuPage.ui. Hãy tạo nó trong Qt Designer!")
+            print("CẢNH BÁO: Không tìm thấy file menuPage.ui")
 
-        self.current_user_data = None  #Biến để giữ hộ thông tin user
+        self.current_user_data = None
+        self.search_thread = None  # Biến để giữ luồng đang chạy
 
-        #Nút profile để nhảy sang trang profil
         if hasattr(self, 'profileBtn'):
             self.profileBtn.clicked.connect(self.goto_profile)
 
+        #Cấu hình tìm kiếm sao cho có gõ thường, không dấu cũng hiện kết quả
+        if hasattr(self, 'searchINPUT'):
+            self.completer = QCompleter(self)
+            self.completer.setCaseSensitivity(Qt.CaseInsensitive)
+            self.completer.setFilterMode(Qt.MatchContains)
+            self.searchINPUT.setCompleter(self.completer)
+            self.searchINPUT.textChanged.connect(self.on_search_text_changed)
+
+        # Timer Debounce
+        self.search_timer = QTimer()
+        self.search_timer.setSingleShot(True)
+        self.search_timer.setInterval(500)
+        self.search_timer.timeout.connect(self.start_api_thread)  # Gọi hàm start thread
+
     def load_user_info(self, user_data):
-        #Hàm này nhận dữ liệu từ Login ném sang để giữ đó
         self.current_user_data = user_data
 
     def goto_profile(self):
-        #Khi bấm nút profile thì ném dữ liệu sang trang Profile và chuyển cảnh
         if self.current_user_data:
             profile_window.load_user_info(self.current_user_data)
-
-        #Chuyển sang màn hình Profile (Index 2)
         widget.setCurrentIndex(2)
 
+    def on_search_text_changed(self, text):
+        self.search_timer.start()
+    #Tạo 1 luồng xử lý riêng biệt
+    #Vì trong lần test đầu tiên chạy lâu quá --> bị đứng app
+    #Nên phải làm vậy
+    def start_api_thread(self):
+        if not hasattr(self, 'searchINPUT'): return
+        keyword = self.searchINPUT.text().strip()
+        if len(keyword) < 2: return
+        print(f"Đang tìm (ngầm): {keyword}...")
 
+
+        #DO NOT LEAK!!!!!!
+        API_KEY = "66edf8ecc8744a7baec8aedbfeca506f" #<---- SACRED ARTIFACT!!!!
+        #THE EMPEROR REQUIRES YOU NOT TO LEAK THIS API KEY!!!!
+
+        #Nếu đang có luồng cũ chạy dở thì tắt nó đi để chạy cái mới
+        if self.search_thread and self.search_thread.isRunning():
+            self.search_thread.terminate()
+            self.search_thread.wait()
+        #Tạo luồng mới
+        self.search_thread = GeopifyWorker(keyword, API_KEY)
+        #Kết nối tín hiệu: Khi Worker làm xong -> Gọi hàm update_suggestion_list
+        self.search_thread.search_finished.connect(self.update_suggestion_list)
+        #Bắt đầu chạy
+        self.search_thread.start()
+    def update_suggestion_list(self, suggestions):
+        #Hàm này chạy khi thằng con worker lấy dữ liệu xong
+        model = QStringListModel()
+        model.setStringList(suggestions)
+        self.completer.setModel(model)
+        if suggestions:
+            self.completer.complete()
+
+        print(f"Đã cập nhật {len(suggestions)} gợi ý.")
+
+
+class GeopifyWorker(QThread):
+    # ín hiệu bắn về khi tìm xong: Trả về một danh sách chữ (list)
+    search_finished = pyqtSignal(list)
+
+    def __init__(self, keyword, api_key):
+        super().__init__()
+        self.keyword = keyword
+        self.api_key = api_key
+
+    def run(self):
+        url = f"https://api.geopify.com/v1/geocode/autocomplete?text={self.keyword}&apiKey={self.api_key}"
+        try:
+            response = requests.get(url, timeout=5)  # Timeout 5s để tránh treo mãi mãi
+            if response.status_code == 200: #Nếu lấy thành công thì data = file json
+                data = response.json()
+                suggestions = []
+                for feature in data['features']:
+                    address = feature['properties'].get('formatted', '')
+                    suggestions.append(address)
+                self.search_finished.emit(suggestions) #--> đưa lên trên chạy
+            else:
+                print("API Error:", response.status_code)
+        except Exception as e:
+            print("Connection Error: ", e)
 #Class Profile
 class ProfileScreen(QtWidgets.QMainWindow):
     def __init__(self):
