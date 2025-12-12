@@ -1,135 +1,165 @@
-import csv
+import sqlite3
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-FILE_NAME = os.path.join(BASE_DIR, "users.csv")
+DB_NAME = os.path.join(BASE_DIR, "users.db")
 
-print(f"--- DEBUG: File CSV sẽ được lưu tại: {FILE_NAME} ---")
+print(f"--- DEBUG: Database SQLite sẽ được lưu tại: {DB_NAME} ---")
 
 
-def ensure_file_exists():
-    """Đảm bảo file CSV tồn tại và có tiêu đề"""
-    if not os.path.exists(FILE_NAME):
-        try:
-            with open(FILE_NAME, mode='w', newline='', encoding='utf-8') as f:
-                writer = csv.writer(f)
-                writer.writerow(["Username", "Password", "Phone", "Email"])
-            print("--- DEBUG: Đã tạo mới file users.csv ---")
-        except Exception as e:
-            print(f"--- LỖI: Không thể tạo file CSV: {e} ---")
+def get_connection():
+    """Tạo kết nối đến database SQLite"""
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row 
+    return conn
+
+
+def initialize_database():
+    """Tạo bảng users nếu chưa tồn tại"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL,
+                phone TEXT,
+                email TEXT
+            )
+        ''')
+        
+        conn.commit()
+        conn.close()
+        print("--- DEBUG: Database đã sẵn sàng ---")
+    except Exception as e:
+        print(f"--- LỖI: Không thể khởi tạo database: {e} ---")
+
+
+# Khởi tạo database khi module được import
+initialize_database()
 
 
 def register_user(username, password, phone, email):
-    ensure_file_exists()  #Chạy kiểm tra file trước
-
+    """Đăng ký user mới"""
     #Kiểm tra xem tài khoản đã tồn tại chưa
     if check_user_exist(username):
         return False, "Tên đăng nhập đã tồn tại!"
 
-    #Lưu dòng mới (tạo luôn file nếu chưa có)
+    #Lưu user mới vào database
     try:
-        with open(FILE_NAME, mode='a', newline='', encoding='utf-8') as f:
-            writer = csv.writer(f)
-            writer.writerow([username, password, phone, email])
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO users (username, password, phone, email) VALUES (?, ?, ?, ?)",
+            (username, password, phone, email)
+        )
+        conn.commit()
+        conn.close()
         return True, "Đăng ký thành công!"
+    except sqlite3.IntegrityError:
+        return False, "Tên đăng nhập đã tồn tại!"
     except Exception as e:
-        return False, f"Lỗi ghi file: {e}"
+        return False, f"Lỗi ghi database: {e}"
 
 
 def check_user_exist(username):
-    #Tên đăng nhập mà trùng với tài khoản khác là cho nó skbidi toilet 67 rizz luôn (cook:]])
-    if not os.path.exists(FILE_NAME): return False
-
+    """Kiểm tra username đã tồn tại chưa"""
     try:
-        with open(FILE_NAME, mode='r', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                if row["Username"] == username:
-                    return True
-    except:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT username FROM users WHERE username = ?", (username,))
+        result = cursor.fetchone()
+        conn.close()
+        return result is not None
+    except Exception as e:
+        print(f"--- LỖI check_user_exist: {e} ---")
         return False
-    return False
 
 
-#Logic đăng nhập
 def check_login(username, password):
-    #Kiểm tra đăng nhập coi có đúng không
-    if not os.path.exists(FILE_NAME):
-        return None, "Chưa có tài khoản nào được đăng ký!"
-
+    """Kiểm tra đăng nhập"""
     try:
-        with open(FILE_NAME, mode='r', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                if row["Username"] == username:
-                    # So sánh password
-                    if row["Password"] == password:
-                        return row, "Đăng nhập thành công!"
-                    else:
-                        return None, "Sai mật khẩu!"
-
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT * FROM users WHERE username = ?", 
+            (username,)
+        )
+        user = cursor.fetchone()
+        conn.close()
+        
+        if user is None:
             return None, "Tài khoản không tồn tại!"
+        
+        # So sánh password
+        if user["password"] == password:
+            user_dict = {
+                "Username": user["username"],
+                "Password": user["password"],
+                "Phone": user["phone"],
+                "Email": user["email"]
+            }
+            return user_dict, "Đăng nhập thành công!"
+        else:
+            return None, "Sai mật khẩu!"
+            
     except Exception as e:
         return None, f"Lỗi đọc dữ liệu: {e}"
 
 
 def update_user_info(current_username, new_phone, new_email):
-    if not os.path.exists(FILE_NAME): return False, "Không tìm thấy file data"
-
-    updated = False
-    all_rows = []
-    fieldnames = ["Username", "Password", "Phone", "Email"]
-    #Kiểm tra xem có sự thay đổi thông tin không
-    #Có thì sửa, không thì thôi
+    """Cập nhật thông tin user"""
     try:
-        with open(FILE_NAME, mode='r', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                if row["Username"] == current_username:
-                    row["Phone"] = new_phone
-                    row["Email"] = new_email
-                    updated = True
-                all_rows.append(row)
-
-        if updated:
-            with open(FILE_NAME, mode='w', newline='', encoding='utf-8') as f:
-                writer = csv.DictWriter(f, fieldnames=fieldnames)
-                writer.writeheader()
-                writer.writerows(all_rows)
-            return True, "Cập nhật thành công!"
-        else:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Kiểm tra user có tồn tại không
+        cursor.execute("SELECT username FROM users WHERE username = ?", (current_username,))
+        if cursor.fetchone() is None:
+            conn.close()
             return False, "Không tìm thấy user để update"
-
+        
+        # Update thông tin
+        cursor.execute(
+            "UPDATE users SET phone = ?, email = ? WHERE username = ?",
+            (new_phone, new_email, current_username)
+        )
+        conn.commit()
+        conn.close()
+        return True, "Cập nhật thành công!"
+        
     except Exception as e:
         return False, f"Lỗi khi update: {e}"
 
+
 def change_password(username, current_password, new_password):
-    if not os.path.exists(FILE_NAME): return False, "Lỗi dữ liệu"
-    updated = False
-    all_rows = []
-    fieldnames = ["Username", "Password", "Phone", "Email"]
-
+    """Đổi mật khẩu"""
     try:
-        with open(FILE_NAME, mode='r', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                if row["Username"] == username:
-                    #Kiểm tra mật khẩu cũ có đúng không
-                    if row["Password"] == current_password:
-                        row["Password"] = new_password
-                        updated = True
-                    else:
-                        return False, "Mật khẩu hiện tại không đúng!"
-                all_rows.append(row)
-
-        if updated:
-            with open(FILE_NAME, mode='w', newline='', encoding='utf-8') as f:
-                writer = csv.DictWriter(f, fieldnames=fieldnames)
-                writer.writeheader()
-                writer.writerows(all_rows)
-            return True, "Đổi mật khẩu thành công!"
-        else:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Lấy thông tin user
+        cursor.execute("SELECT password FROM users WHERE username = ?", (username,))
+        user = cursor.fetchone()
+        
+        if user is None:
+            conn.close()
             return False, "Không tìm thấy người dùng!"
-
+        
+        # Kiểm tra mật khẩu cũ có đúng không
+        if user["password"] != current_password:
+            conn.close()
+            return False, "Mật khẩu hiện tại không đúng!"
+        
+        # Update mật khẩu mới
+        cursor.execute(
+            "UPDATE users SET password = ? WHERE username = ?",
+            (new_password, username)
+        )
+        conn.commit()
+        conn.close()
+        return True, "Đổi mật khẩu thành công!"
+        
     except Exception as e:
         return False, f"Lỗi hệ thống: {e}"
