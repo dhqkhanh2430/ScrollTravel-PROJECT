@@ -3,10 +3,12 @@ import os
 import re
 import time
 import requests
+import urllib3
 from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtCore import QTimer, QStringListModel, Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import QMessageBox, QCompleter
 
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 #Import mấy cái file cần cho cái đống ở dưới
 import res
@@ -96,7 +98,7 @@ class MenuScreen(QtWidgets.QMainWindow):
             print("CẢNH BÁO: Không tìm thấy file menuPage.ui")
 
         self.current_user_data = None
-        self.search_thread = None  # Biến để giữ luồng đang chạy
+        self.search_thread = None  #Biến để giữ luồng đang chạy
 
         if hasattr(self, 'profileBtn'):
             self.profileBtn.clicked.connect(self.goto_profile)
@@ -105,14 +107,15 @@ class MenuScreen(QtWidgets.QMainWindow):
         if hasattr(self, 'searchINPUT'):
             self.completer = QCompleter(self)
             self.completer.setCaseSensitivity(Qt.CaseInsensitive)
-            self.completer.setFilterMode(Qt.MatchContains)
+            # Quan trọng: Tắt bộ lọc mặc định để tin tưởng kết quả API trả về
+            self.completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
             self.searchINPUT.setCompleter(self.completer)
             self.searchINPUT.textChanged.connect(self.on_search_text_changed)
 
-        # Timer Debounce
+        #Timer Debounce
         self.search_timer = QTimer()
         self.search_timer.setSingleShot(True)
-        self.search_timer.setInterval(500)
+        self.search_timer.setInterval(300)  # Giảm xuống 300ms cho mượt
         self.search_timer.timeout.connect(self.start_api_thread)  # Gọi hàm start thread
 
     def load_user_info(self, user_data):
@@ -125,65 +128,92 @@ class MenuScreen(QtWidgets.QMainWindow):
 
     def on_search_text_changed(self, text):
         self.search_timer.start()
+
     #Tạo 1 luồng xử lý riêng biệt
     #Vì trong lần test đầu tiên chạy lâu quá --> bị đứng app
     #Nên phải làm vậy
     def start_api_thread(self):
         if not hasattr(self, 'searchINPUT'): return
         keyword = self.searchINPUT.text().strip()
+        #Gõ 2 ký tự là tìm được rồi
         if len(keyword) < 2: return
-        print(f"Đang tìm (ngầm): {keyword}...")
-
-
-        #DO NOT LEAK!!!!!!
-        API_KEY = "66edf8ecc8744a7baec8aedbfeca506f" #<---- SACRED ARTIFACT!!!!
-        #THE EMPEROR REQUIRES YOU NOT TO LEAK THIS API KEY!!!!
+        print(f"Đang tìm: {keyword}...")
 
         #Nếu đang có luồng cũ chạy dở thì tắt nó đi để chạy cái mới
         if self.search_thread and self.search_thread.isRunning():
             self.search_thread.terminate()
             self.search_thread.wait()
-        #Tạo luồng mới
-        self.search_thread = GeopifyWorker(keyword, API_KEY)
+
+        #Tạo luồng mới (Không cần API Key nữa)
+        self.search_thread = provinceOpenAPI(keyword, "")
         #Kết nối tín hiệu: Khi Worker làm xong -> Gọi hàm update_suggestion_list
         self.search_thread.search_finished.connect(self.update_suggestion_list)
         #Bắt đầu chạy
         self.search_thread.start()
+
     def update_suggestion_list(self, suggestions):
         #Hàm này chạy khi thằng con worker lấy dữ liệu xong
         model = QStringListModel()
         model.setStringList(suggestions)
         self.completer.setModel(model)
+
         if suggestions:
+            #Set prefix rỗng để lừa Completer hiện hết danh sách
+            self.completer.setCompletionPrefix('')
             self.completer.complete()
 
         print(f"Đã cập nhật {len(suggestions)} gợi ý.")
 
 
-class GeopifyWorker(QThread):
-    # ín hiệu bắn về khi tìm xong: Trả về một danh sách chữ (list)
+# Class Worker chạy ngầm gọi API
+class provinceOpenAPI(QThread):
     search_finished = pyqtSignal(list)
 
     def __init__(self, keyword, api_key):
         super().__init__()
         self.keyword = keyword
-        self.api_key = api_key
+        #Giữ tham số api_key để code bên Menu không bị lỗi gọi hàm, dù không dùng
 
     def run(self):
-        url = f"https://api.geopify.com/v1/geocode/autocomplete?text={self.keyword}&apiKey={self.api_key}"
+        #Sử dụng API Hành chính Việt Nam - Nhanh và Chính xác
+        url = "https://provinces.open-api.vn/api/?depth=2"
+
         try:
-            response = requests.get(url, timeout=5)  # Timeout 5s để tránh treo mãi mãi
-            if response.status_code == 200: #Nếu lấy thành công thì data = file json
+            #Verify=False để tránh lỗi SSL nếu mạng trường chặn
+            response = requests.get(url, timeout=5, verify=False)
+
+            if response.status_code == 200:
                 data = response.json()
                 suggestions = []
-                for feature in data['features']:
-                    address = feature['properties'].get('formatted', '')
-                    suggestions.append(address)
-                self.search_finished.emit(suggestions) #--> đưa lên trên chạy
+                keyword_lower = self.keyword.lower()
+                count = 0
+
+                #Logic lọc dữ liệu tỉnh thành
+                for province in data:
+                    if count > 15: break  # Lấy tối đa 15 kết quả
+
+                    #Kiểm tra tên Tỉnh
+                    p_name = province['name']
+                    if keyword_lower in p_name.lower():
+                        suggestions.append(p_name)
+                        count += 1
+                        continue
+
+                        #Kiểm tra tên Quận/Huyện
+                    for district in province.get('districts', []):
+                        d_name = district['name']
+                        if keyword_lower in d_name.lower():
+                            full_name = f"{d_name}, {p_name}"
+                            suggestions.append(full_name)
+                            count += 1
+                            if count > 15: break
+
+                self.search_finished.emit(suggestions)
             else:
-                print("API Error:", response.status_code)
+                print(f"Lỗi API: {response.status_code}")
         except Exception as e:
-            print("Connection Error: ", e)
+            print(f"Lỗi mạng: {e}")
+
 #Class Profile
 class ProfileScreen(QtWidgets.QMainWindow):
     def __init__(self):
