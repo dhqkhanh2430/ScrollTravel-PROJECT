@@ -100,6 +100,14 @@ class MenuScreen(QtWidgets.QMainWindow):
         self.current_user_data = None
         self.search_thread = None  #Biến để giữ luồng đang chạy
 
+        # Load default posts từ database
+        count = self.load_default_posts()
+        if count:
+            print(f"Đã load {count} bài viết lên màn hình")
+
+        if hasattr(self, 'refreshBtn'):
+            self.refreshBtn.clicked.connect(self.handle_refresh)
+
         if hasattr(self, 'profileBtn'):
             self.profileBtn.clicked.connect(self.goto_profile)
 
@@ -163,6 +171,117 @@ class MenuScreen(QtWidgets.QMainWindow):
             self.completer.complete()
 
         print(f"Đã cập nhật {len(suggestions)} gợi ý.")
+
+    def load_default_posts(self):
+        """Load và hiển thị default posts từ database"""
+        try:
+            # Xóa các dummy posts cũ
+            if hasattr(self, 'scrollAreaWidgetContents'):
+                layout = self.scrollAreaWidgetContents.layout()
+                if layout:
+                    # Xóa tất cả widget cũ
+                    while layout.count():
+                        item = layout.takeAt(0)
+                        if item.widget():
+                            item.widget().deleteLater()
+                    
+                    # Lấy dữ liệu từ database
+                    posts = data_manager.get_all_default_posts()
+                    # Sắp xếp theo ID giảm dần (bài mới nhất lên trên)
+                    posts.sort(key=lambda x: x['id'], reverse=True)
+                    
+                    # Tạo widget cho mỗi bài viết
+                    for post in posts:
+                        post_widget = self.create_post_widget(post)
+                        layout.addWidget(post_widget)
+                    
+                    # Thêm spacer để đẩy các posts lên trên
+                    spacer = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+                    layout.addItem(spacer)
+                    
+                    return len(posts)
+                else:
+                    print("Không tìm thấy layout")
+                    return 0
+            else:
+                print("Không tìm thấy scrollAreaWidgetContents")
+                return 0
+        except Exception as e:
+            print(f"Lỗi khi load default posts: {e}")
+            return 0
+
+    def handle_refresh(self):
+        """Xử lý khi nhấn nút refresh"""
+        count = self.load_default_posts()
+        print(f"Đã refresh lại Homescreen, có tổng cộng {count} bài viết")
+
+    def create_post_widget(self, post):
+        """Tạo widget card cho một bài viết"""
+        # Tạo frame chính với style giống dummy posts
+        frame = QtWidgets.QFrame()
+        frame.setMinimumSize(500, 200)
+        frame.setMaximumSize(1920, 200)
+        frame.setStyleSheet("""
+            QFrame {
+                background-color: white;
+                border-radius: 15px;
+                border: 1px solid #ddd;
+            }
+            QFrame:hover {
+                border: 2px solid #00aaff;
+            }
+        """)
+        
+        # Layout ngang: ảnh bên trái, nội dung bên phải
+        h_layout = QtWidgets.QHBoxLayout(frame)
+        h_layout.setContentsMargins(10, 10, 10, 10)
+        h_layout.setSpacing(15)
+        
+        # Label hiển thị ảnh
+        image_label = QtWidgets.QLabel()
+        image_label.setFixedSize(250, 180)
+        image_label.setScaledContents(True)
+        image_label.setStyleSheet("border-radius: 10px;")
+        
+        # Load ảnh từ đường dẫn
+        image_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), post['image_path'])
+        if os.path.exists(image_path):
+            pixmap = QtGui.QPixmap(image_path)
+            image_label.setPixmap(pixmap)
+        else:
+            image_label.setText("No Image")
+            image_label.setStyleSheet("background-color: #f0f0f0; border-radius: 10px;")
+        
+        h_layout.addWidget(image_label)
+        
+        # Layout dọc cho tiêu đề và mô tả
+        v_layout = QtWidgets.QVBoxLayout()
+        v_layout.setSpacing(10)
+        
+        # Tiêu đề
+        title_label = QtWidgets.QLabel(post['title'])
+        title_label.setStyleSheet("""
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        """)
+        title_label.setWordWrap(True)
+        v_layout.addWidget(title_label)
+        
+        # Mô tả
+        desc_label = QtWidgets.QLabel(post['description'])
+        desc_label.setStyleSheet("""
+            font-size: 14px;
+            color: #666;
+            line-height: 1.5;
+        """)
+        desc_label.setWordWrap(True)
+        desc_label.setAlignment(Qt.AlignTop | Qt.AlignLeft)
+        v_layout.addWidget(desc_label, 1)  # stretch = 1 để chiếm hết không gian
+        
+        h_layout.addLayout(v_layout, 1)
+        
+        return frame
 
 
 # Class Worker chạy ngầm gọi API
