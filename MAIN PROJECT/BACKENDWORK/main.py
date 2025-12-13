@@ -110,6 +110,9 @@ class MenuScreen(QtWidgets.QMainWindow):
 
         if hasattr(self, 'profileBtn'):
             self.profileBtn.clicked.connect(self.goto_profile)
+        
+        if hasattr(self, 'favoriteBtn'):
+            self.favoriteBtn.clicked.connect(self.goto_favorite)
 
         #Cấu hình tìm kiếm sao cho có gõ thường, không dấu cũng hiện kết quả
         if hasattr(self, 'searchINPUT'):
@@ -133,6 +136,18 @@ class MenuScreen(QtWidgets.QMainWindow):
         if self.current_user_data:
             profile_window.load_user_info(self.current_user_data)
         widget.setCurrentIndex(2)
+    
+    def goto_favorite(self):
+        """Chuyển sang màn hình địa điểm yêu thích"""
+        if self.current_user_data:
+            try:
+                username = self.current_user_data.get('Username', '')
+                favorite_window.load_favorites(username)
+                widget.setCurrentIndex(4)
+            except Exception as e:
+                QMessageBox.critical(self, "Lỗi", f"Không thể mở trang yêu thích: {e}")
+        else:
+            QMessageBox.warning(self, "Cảnh báo", "Vui lòng đăng nhập trước!")
 
     def on_search_text_changed(self, text):
         self.search_timer.start()
@@ -618,17 +633,22 @@ if __name__ == "__main__":
     #Tạo Stack chứa các màn hình
     widget = QtWidgets.QStackedWidget()
 
-    #Khởi tạo 4 màn hình (THÊM MENU)
+    #Import FavoritePlacesWindow
+    from add_favorite_places import FavoritePlacesWindow
+
+    #Khởi tạo 5 màn hình
     login_window = LoginScreen()  # Index 0
     register_window = RegisterScreen()  # Index 1
     profile_window = ProfileScreen()  # Index 2
     menu_window = MenuScreen()  # Index 3
+    favorite_window = FavoritePlacesWindow("")  # Index 4
 
     #Thêm vào Stack
     widget.addWidget(login_window)
     widget.addWidget(register_window)
     widget.addWidget(profile_window)
     widget.addWidget(menu_window)
+    widget.addWidget(favorite_window)
 
     #Cấu hình cửa sổ
     widget.resize(860, 540)

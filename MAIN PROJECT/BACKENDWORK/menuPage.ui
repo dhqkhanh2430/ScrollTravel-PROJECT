@@ -135,6 +135,7 @@ QPushButton#searchBtn:hover {
           <string notr="true">QPushButton#refreshBtn{
 	border: 1px solid transparent;
 	font-size: 20px;
+	margin-right: 10px;
 }
 
 QPushButton#refreshBtn:hover {
@@ -149,20 +150,36 @@ QPushButton#refreshBtn:hover {
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Minimum</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
+        <widget class="QPushButton" name="favoriteBtn">
+         <property name="minimumSize">
           <size>
-           <width>40</width>
-           <height>20</height>
+           <width>50</width>
+           <height>50</height>
           </size>
          </property>
-        </spacer>
+         <property name="maximumSize">
+          <size>
+           <width>50</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton#favoriteBtn{
+	border-image: url(../ASSETS/addToFavoritePlaces/lovebutton.jpg) 0 0 0 0 stretch stretch;
+	border: 1px solid transparent;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+QPushButton#favoriteBtn:hover {
+    border: 2px solid #ff6b6b; 
+    border-radius: 5px;
+}</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="profileBtn">
