@@ -44,11 +44,37 @@
       </property>
      </spacer>
     </item>
+    <item row="1" column="0">
+     <spacer name="horizontalSpacer_3">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>276</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="0" column="2">
+     <spacer name="verticalSpacer_3">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>99</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
     <item row="1" column="1" rowspan="2" colspan="2">
      <widget class="QWidget" name="widget" native="true">
       <property name="minimumSize">
        <size>
-        <width>500</width>
+        <width>630</width>
         <height>500</height>
        </size>
       </property>
@@ -328,6 +354,19 @@ QTextEdit:focus {
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
           <widget class="QPushButton" name="editBtn">
            <property name="minimumSize">
             <size>
@@ -477,28 +516,28 @@ QPushButton:pressed {
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">/* --- TRẠNG THÁI BÌNH THƯỜNG --- */
-QPushButton {
-    background-color: #2980b9; /* Màu xanh dương (Màu nền chính) */
-    color: white;              /* Màu chữ */
-    font-weight: bold;         /* Chữ đậm */
-    font-size: 15px;           /* Cỡ chữ */
-    border-radius: 10px;       /* Bo tròn góc */
-    padding: 10px;             /* Khoảng cách đệm để nút to ra */
-    border: none;              /* Xóa viền xấu xí mặc định */
+            <string notr="true">
+QPushButton#goBackBtn{
+    background-color: #2980b9; 
+    color: white;            
+    font-weight: bold;         
+    font-size: 15px;           
+    border-radius: 10px;       
+    padding: 10px;            
+    border: none;              
 	margin-top: 8px;
 	margin-bottom: 20px;
 }
 
-/* --- KHI DI CHUỘT VÀO (HOVER) --- */
+
 QPushButton:hover {
-    background-color: #3498db; /* Đổi sang màu xanh sáng hơn */
+    background-color: #3498db; /
 }
 
-/* --- KHI BẤM GIỮ CHUỘT (PRESSED) --- */
+
 QPushButton:pressed {
-    background-color: #1f618d; /* Đổi sang màu tối hơn (cảm giác nút lún xuống) */
-    padding-top: 12px;         /* (Mẹo) Dịch chữ xuống 1 xíu tạo cảm giác nhấn thật */
+    background-color: #1f618d; 
+    padding-top: 12px;       
     padding-left: 12px;
 }</string>
            </property>
@@ -506,6 +545,64 @@ QPushButton:pressed {
             <string>Quay về</string>
            </property>
           </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="postBtn">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>80</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>200</width>
+             <height>100</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">
+QPushButton#postBtn{
+    background-color: #2980b9; 
+    color: white;            
+    font-weight: bold;         
+    font-size: 15px;           
+    border-radius: 10px;       
+    padding: 10px;            
+    border: none;              
+	margin-top: 8px;
+	margin-bottom: 20px;
+}
+
+
+QPushButton#postBtn:hover {
+    background-color: #3498db; /
+}
+
+
+QPushButton#postBtn:pressed {
+    background-color: #1f618d; 
+    padding-top: 12px;       
+    padding-left: 12px;
+}</string>
+           </property>
+           <property name="text">
+            <string>ADD POST</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </item>
@@ -524,32 +621,6 @@ QPushButton:pressed {
        </item>
       </layout>
      </widget>
-    </item>
-    <item row="0" column="2">
-     <spacer name="verticalSpacer_3">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>99</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="1" column="0">
-     <spacer name="horizontalSpacer_3">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>276</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
     </item>
    </layout>
   </widget>

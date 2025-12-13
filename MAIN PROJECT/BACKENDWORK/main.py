@@ -4,6 +4,8 @@ import re
 import time
 import requests
 import urllib3
+import shutil
+import datetime
 from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtCore import QTimer, QStringListModel, Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import QMessageBox, QCompleter
@@ -131,6 +133,7 @@ class MenuScreen(QtWidgets.QMainWindow):
 
     def load_user_info(self, user_data):
         self.current_user_data = user_data
+        self.load_default_posts()
 
     def goto_profile(self):
         if self.current_user_data:
@@ -230,9 +233,9 @@ class MenuScreen(QtWidgets.QMainWindow):
         count = self.load_default_posts()
         print(f"Đã refresh lại Homescreen, có tổng cộng {count} bài viết")
 
+    #Tạo bài viết
     def create_post_widget(self, post):
-        """Tạo widget card cho một bài viết"""
-        # Tạo frame chính với style giống dummy posts
+        #Tạo frame chính
         frame = QtWidgets.QFrame()
         frame.setMinimumSize(500, 200)
         frame.setMaximumSize(1920, 200)
@@ -246,57 +249,122 @@ class MenuScreen(QtWidgets.QMainWindow):
                 border: 2px solid #00aaff;
             }
         """)
-        
-        # Layout ngang: ảnh bên trái, nội dung bên phải
+
+        #Layout ngang chính
         h_layout = QtWidgets.QHBoxLayout(frame)
         h_layout.setContentsMargins(10, 10, 10, 10)
         h_layout.setSpacing(15)
-        
-        # Label hiển thị ảnh
+
+        #Phần ảnh
         image_label = QtWidgets.QLabel()
         image_label.setFixedSize(250, 180)
         image_label.setScaledContents(True)
         image_label.setStyleSheet("border-radius: 10px;")
-        
-        # Load ảnh từ đường dẫn
-        image_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), post['image_path'])
-        if os.path.exists(image_path):
-            pixmap = QtGui.QPixmap(image_path)
-            image_label.setPixmap(pixmap)
-        else:
-            image_label.setText("No Image")
-            image_label.setStyleSheet("background-color: #f0f0f0; border-radius: 10px;")
-        
+
+        #Xử lý đường dẫn ảnh
+        #DB lưu dạng: ../ASSETS/picForDefaultPost/abc.jpg
+        #Cần chuyển thành đường dẫn tuyệt đối để hiển thị
+        try:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            #post['image_path'] là ../ASSETS... nên dùng os.path.join sẽ tự lùi thư mục
+            rel_path = post['image_path']
+            image_abs_path = os.path.abspath(os.path.join(base_dir, rel_path))
+
+            if os.path.exists(image_abs_path):
+                pixmap = QtGui.QPixmap(image_abs_path)
+                image_label.setPixmap(pixmap)
+            else:
+                image_label.setText("No Image")
+                image_label.setStyleSheet("background-color: #f0f0f0; border-radius: 10px; color: gray;")
+        except Exception:
+            image_label.setText("Error Image")
+
         h_layout.addWidget(image_label)
-        
-        # Layout dọc cho tiêu đề và mô tả
+
+        #Layout phần nội dung
         v_layout = QtWidgets.QVBoxLayout()
-        v_layout.setSpacing(10)
-        
-        # Tiêu đề
+        v_layout.setSpacing(5)
+
+        #Tiêu đề
         title_label = QtWidgets.QLabel(post['title'])
-        title_label.setStyleSheet("""
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-        """)
+        title_label.setStyleSheet("font-size: 18px; font-weight: bold; color: #333; border: none;")
         title_label.setWordWrap(True)
         v_layout.addWidget(title_label)
-        
-        # Mô tả
+
+        #Mô tả
         desc_label = QtWidgets.QLabel(post['description'])
-        desc_label.setStyleSheet("""
-            font-size: 14px;
-            color: #666;
-            line-height: 1.5;
-        """)
+        desc_label.setStyleSheet("font-size: 14px; color: #666; border: none;")
         desc_label.setWordWrap(True)
         desc_label.setAlignment(Qt.AlignTop | Qt.AlignLeft)
-        v_layout.addWidget(desc_label, 1)  # stretch = 1 để chiếm hết không gian
-        
+        v_layout.addWidget(desc_label, 1)  # Stretch 1 để đẩy các thành phần khác
+
         h_layout.addLayout(v_layout, 1)
-        
+
+        #Nút xóa (chỉ dành cho admin thấy)
+        #Kiểm tra xem người dùng hiện tại có phải admin không
+        is_admin = False
+        if self.current_user_data and self.current_user_data.get('Username') == 'admin':
+            is_admin = True
+
+        if is_admin:
+            #Tạo một layout dọc nhỏ bên phải để chứa nút xóa
+            btn_layout = QtWidgets.QVBoxLayout()
+            btn_layout.setAlignment(Qt.AlignTop)
+
+            delete_btn = QtWidgets.QPushButton("X")
+            delete_btn.setFixedSize(30, 30)
+            delete_btn.setCursor(Qt.PointingHandCursor)
+            delete_btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #ff4d4d;
+                    color: white;
+                    font-weight: bold;
+                    border-radius: 15px;
+                    border: none;
+                }
+                QPushButton:hover {
+                    background-color: #ff0000;
+                }
+            """)
+            #Quan trọng: Dùng lambda để truyền ID vài hàm xử lý
+            #post['id'] là ID trong database
+            #post['image_path'] truyền vào để tí nữa xóa file
+            delete_btn.clicked.connect(lambda: self.handle_delete_post(post['id'], post['image_path']))
+
+            btn_layout.addWidget(delete_btn)
+            h_layout.addLayout(btn_layout)
+
         return frame
+    #Xóa bài viết
+    def handle_delete_post(self, post_id, image_rel_path):
+        # 1. Hỏi xác nhận
+        reply = QMessageBox.question(
+            self, "Xác nhận xóa",
+            "Bạn có chắc chắn muốn xóa bài viết này không?\nHành động này không thể hoàn tác.",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No
+        )
+
+        if reply == QMessageBox.Yes:
+            #2. Xóa trong Database
+            success, msg = data_manager.delete_default_post(post_id)
+
+            if success:
+                #3. Xóa file ảnh (Dọn rác)
+                try:
+                    base_dir = os.path.dirname(os.path.abspath(__file__))
+                    image_abs_path = os.path.abspath(os.path.join(base_dir, image_rel_path))
+
+                    if os.path.exists(image_abs_path):
+                        os.remove(image_abs_path)  # Lệnh xóa file của hệ điều hành
+                        print(f"Đã xóa file ảnh: {image_abs_path}")
+                except Exception as e:
+                    print(f"Cảnh báo: Không xóa được file ảnh: {e}")
+
+                #4. Refresh lại giao diện
+                QMessageBox.information(self, "Thành công", msg)
+                self.load_default_posts()  #Load lại danh sách
+            else:
+                QMessageBox.critical(self, "Lỗi", msg)
 
 
 # Class Worker chạy ngầm gọi API
@@ -349,42 +417,55 @@ class provinceOpenAPI(QThread):
             print(f"Lỗi mạng: {e}")
 
 #Class Profile
+# Class Profile (Đã cập nhật Admin)
 class ProfileScreen(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         try:
             uic.loadUi(get_ui_path("profilePage.ui"), self)
         except FileNotFoundError:
-            print("CẢNH BÁO: Không tìm thấy file profilePage.ui. Hãy tạo nó trong Qt Designer!")
+            print("CẢNH BÁO: Không tìm thấy file profilePage.ui")
 
         self.is_editing = False
         self.current_username = ""
         self.change_pass_dialog = None
 
+        #Logic admin, phải là admin mới được đăng bài
+        if hasattr(self, 'postBtn'):
+            self.postBtn.hide()
+            self.postBtn.clicked.connect(self.open_post_dialog)
+
         try:
             self.editBtn.clicked.connect(self.toggle_edit_mode)
         except AttributeError:
-            print("Lỗi UI: Không tìm thấy nút 'editBtn'")
+            pass
 
         try:
             self.changePasswordBtn.clicked.connect(self.change_password)
         except AttributeError:
-            print("Lỗi UI: Không tìm thấy nút 'editBtn'")
+            pass
 
         try:
             self.logOutBtn.clicked.connect(self.logout)
         except AttributeError:
-            print("Lỗi UI: Không tìm thấy nút 'logOutBtn'")
+            pass
 
         try:
             self.goBackBtn.clicked.connect(self.go_back)
         except AttributeError:
-            print("Lỗi UI: Không tìm thấy nút 'goBackBtn'")
+            pass
 
         self.set_fields_readonly(True)
 
     def load_user_info(self, user_data):
         self.current_username = user_data.get("Username", "")
+
+        #Kiểm tra có phải admin
+        if hasattr(self, 'postBtn'):
+            if self.current_username == "admin":
+                self.postBtn.show()  #Hiện nút nếu là admin
+            else:
+                self.postBtn.hide()  #Ẩn nút nếu là user thường
 
         if hasattr(self, 'usernameEdit'):
             self.usernameEdit.setText(self.current_username)
@@ -400,64 +481,44 @@ class ProfileScreen(QtWidgets.QMainWindow):
         self.editBtn.setText("Chỉnh sửa thông tin")
         self.set_fields_readonly(True)
 
+    def open_post_dialog(self):
+        dialog = PostDialog(self)
+        if dialog.exec_() == QtWidgets.QDialog.Accepted:
+            #Nếu đăng thành công -> Refresh Menu ngay lập tức
+            if 'menu_window' in globals():
+                menu_window.handle_refresh()
+                widget.setCurrentIndex(3)  #Chuyển về trang chủ để xem bài mới
+
     def go_back(self):
-        # Quay về trang Menu (Index 3)
         widget.setCurrentIndex(3)
 
-    #Hàm chỉnh sưa thông tin
     def set_fields_readonly(self, state):
         if hasattr(self, 'emailEdit'): self.emailEdit.setReadOnly(state)
         if hasattr(self, 'phoneEdit'): self.phoneEdit.setReadOnly(state)
-
         if hasattr(self, 'usernameEdit'): self.usernameEdit.setReadOnly(True)
-        # Cập nhật style cho người dùng nhận biết
+
         if state:
-            style = """
-                QLineEdit {
-                    background-color: white;
-                    border: 1px solid #cccccc;
-                    border-radius: 10px;
-                    color: black;
-                    padding-left: 10px;
-                }
-            """
+            style = "QLineEdit { background-color: white; border: 1px solid #cccccc; border-radius: 10px; color: black; padding-left: 10px; }"
         else:
-            style = """
-                QLineEdit {
-                    background-color: #e0e0e0;
-                    border: 2px solid #00aaff;
-                    border-radius: 10px;
-                    color: black;
-                    padding-left: 10px;
-                }
-            """
+            style = "QLineEdit { background-color: #e0e0e0; border: 2px solid #00aaff; border-radius: 10px; color: black; padding-left: 10px; }"
 
         if hasattr(self, 'emailEdit'): self.emailEdit.setStyleSheet(style)
         if hasattr(self, 'phoneEdit'): self.phoneEdit.setStyleSheet(style)
-
         if hasattr(self, 'usernameEdit'):
-            self.usernameEdit.setStyleSheet("""
-                QLineEdit {
-                    background-color: #f0f0f0;
-                    border: 1px solid #cccccc; 
-                    border-radius: 10px;
-                    color: #555555;
-                    padding-left: 10px;
-                }
-            """)
+            self.usernameEdit.setStyleSheet(
+                "QLineEdit { background-color: #f0f0f0; border: 1px solid #cccccc; border-radius: 10px; color: #555555; padding-left: 10px; }")
 
     def toggle_edit_mode(self):
         if not self.is_editing:
             self.is_editing = True
             self.editBtn.setText("Lưu thay đổi")
             self.set_fields_readonly(False)
-
             if hasattr(self, 'phoneEdit'): self.phoneEdit.setFocus()
-
         else:
             new_phone = self.phoneEdit.text()
             new_email = self.emailEdit.text()
 
+            #Gọi hàm update từ data_manager
             success, msg = data_manager.update_user_info(self.current_username, new_phone, new_email)
 
             if success:
@@ -469,17 +530,99 @@ class ProfileScreen(QtWidgets.QMainWindow):
                 QMessageBox.critical(self, "Lỗi", msg)
 
     def logout(self):
-        reply = QMessageBox.question(self, "Xác nhận đăng xuất", "Bạn có muốn đăng xuất khỏi tài khoản không?",
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        reply = QMessageBox.question(self, "Xác nhận", "Bạn có muốn đăng xuất?", QMessageBox.Yes | QMessageBox.No,
+                                     QMessageBox.No)
         if reply == QMessageBox.Yes:
-            widget.setCurrentIndex(0)  # Quay về Login
-        else:
-            pass  # giữ nguyên không làm gì
+            widget.setCurrentIndex(0)
 
     def change_password(self):
         self.change_pass_dialog = ChangePasswordWindow(self.current_username, self)
         self.change_pass_dialog.show()
 
+
+class PostDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        try:
+            #Load giao diện postDialog.ui
+            uic.loadUi(get_ui_path("postDialog.ui"), self)
+        except Exception as e:
+            QMessageBox.critical(self, "Lỗi UI", f"Không tìm thấy postDialog.ui: {e}")
+            return
+
+        self.source_image_path = ""  #Đường dẫn ảnh gốc
+        self.final_db_path = ""  #Đường dẫn lưu vào DB
+
+        #Kết nối các nút bấm
+        if hasattr(self, 'uploadBtn'):
+            self.uploadBtn.clicked.connect(self.choose_image)
+        if hasattr(self, 'confirmBtn'):
+            self.confirmBtn.clicked.connect(self.handle_post)
+        if hasattr(self, 'cancelBtn'):
+            self.cancelBtn.clicked.connect(self.close)
+
+    def choose_image(self):
+        file_name, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self, "Chọn ảnh", "", "Image Files (*.png *.jpg *.jpeg *.bmp)"
+        )
+
+        if file_name:
+            self.source_image_path = file_name
+
+            # Hiển thị lên imagelbl
+            if hasattr(self, 'imagelbl'):
+                pixmap = QtGui.QPixmap(file_name)
+                # Scale ảnh
+                w = self.imagelbl.width()
+                h = self.imagelbl.height()
+                scaled_pixmap = pixmap.scaled(w, h, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                self.imagelbl.setPixmap(scaled_pixmap)
+                self.imagelbl.setAlignment(Qt.AlignCenter)
+
+    #Copy dữ liệu vào database
+    def handle_post(self):
+        # 1. Lấy dữ liệu
+        title = ""
+        content = ""
+        if hasattr(self, 'titleINPUT'): title = self.titleINPUT.text().strip()
+        if hasattr(self, 'contextINPUT'): content = self.contextINPUT.toPlainText().strip()
+
+        # 2. Kiểm tra dữ liệu
+        if not title or not content:
+            QMessageBox.warning(self, "Thiếu thông tin", "Vui lòng nhập tiêu đề và nội dung!")
+            return
+
+        if not self.source_image_path:
+            QMessageBox.warning(self, "Thiếu ảnh", "Vui lòng chọn ảnh minh họa!")
+            return
+
+        try:
+            #3. Copy ảnh vào thư mục dự án
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            file_ext = os.path.splitext(self.source_image_path)[1]
+            new_filename = f"post_{timestamp}{file_ext}"
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            dest_dir = os.path.join(current_dir, "..", "ASSETS", "picForDefaultPost")
+
+            if not os.path.exists(dest_dir):
+                os.makedirs(dest_dir)
+
+            dest_path = os.path.join(dest_dir, new_filename)
+            shutil.copy2(self.source_image_path, dest_path)
+
+            #4. Lưu vào Database
+            self.final_db_path = f"../ASSETS/picForDefaultPost/{new_filename}"
+
+            success, msg = data_manager.add_default_post(title, content, self.final_db_path)
+
+            if success:
+                QMessageBox.information(self, "Thành công", "Đã đăng bài viết mới!")
+                self.accept()  # Trả về kết quả thành công
+            else:
+                QMessageBox.critical(self, "Lỗi Database", msg)
+
+        except Exception as e:
+            QMessageBox.critical(self, "Lỗi hệ thống", f"Chi tiết lỗi: {e}")
 
 #Class Login
 class LoginScreen(QtWidgets.QMainWindow):
@@ -487,6 +630,8 @@ class LoginScreen(QtWidgets.QMainWindow):
         super().__init__()
         try:
             uic.loadUi(get_ui_path("loginPage.ui"), self)
+            if hasattr(self, 'password'):
+                self.password.setEchoMode(QtWidgets.QLineEdit.Password)
         except FileNotFoundError:
             print("Lỗi: Không tìm thấy file loginPage.ui!")
 

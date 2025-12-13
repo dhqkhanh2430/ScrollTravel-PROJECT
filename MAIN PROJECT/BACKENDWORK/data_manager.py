@@ -217,3 +217,15 @@ def get_default_post_by_id(post_id):
     except Exception as e:
         print(f"--- LỖI get_default_post_by_id: {e} ---")
         return None
+
+def delete_default_post(post_id):
+    #Xóa bài viết dựa trên ID
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM default_posts WHERE id = ?", (post_id,))
+        conn.commit()
+        conn.close()
+        return True, "Đã xóa bài viết thành công!"
+    except Exception as e:
+        return False, f"Lỗi khi xóa bài viết: {e}"
