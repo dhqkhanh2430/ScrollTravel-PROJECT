@@ -1,36 +1,14 @@
-import os
-import random
-from PyQt5.QtGui import QPixmap
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(BASE_DIR)
-ASSETS_IMAGES_DIR = os.path.join(PROJECT_ROOT, "ASSETS", "images")
-
-#this method pulls a random photo in the folder which name is the category of the object 
-#the main folder "images" is in ASSETS
-def random_qpixmap(folder):
-    folder_path = os.path.join(ASSETS_IMAGES_DIR, folder)
-
-    files = os.listdir(folder_path)
-    images = [f for f in files if f.lower().endswith((".png", ".jpg", ".jpeg"))]
-
-    filename = random.choice(images)
-    full_path = os.path.join(folder_path, filename)
-
-    return QPixmap(full_path)
-
 class Location_Components:
-    def __init__(self, name, addr, category, lat, lon, label=None):
+    def __init__(self, name, addr, category, lat, lon):
         self.name = name
         self.addr = addr
         self.lat = lat
         self.lon = lon
-        self.label = label
 
-        if "accomodation.hotel" in category:
-            self.category = "Accomodation.Hotel"
-        elif "accomodation.motel" in category:
-            self.category = "Accomodation.Motel"
+        if "accommodation.hotel" in category:
+            self.category = "Accommodation.Hotel"
+        elif "accommodation.motel" in category:
+            self.category = "Accommodation.Motel"
 
         elif "catering.bar" in category:
             self.category = "Catering.Bar"
@@ -61,12 +39,3 @@ class Location_Components:
 
         else:
             self.category = "Unknown"
-
-        if self.label:
-            image_folder = f"images/{self.category}"
-            pix = random_qpixmap(image_folder)
-            if pix:
-
-                self.label.setPixmap(pix)
-
-
