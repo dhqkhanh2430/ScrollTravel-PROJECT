@@ -25,6 +25,9 @@ Pillow
 # For loading environment variables from a .env file (good for API keys)
 python-dotenv
 
+# For displaying the map
+PyQtWebEngine
+
 # ----------------------------------
 # STYLING (OPTIONAL BUT RECOMMENDED)
 # ----------------------------------
