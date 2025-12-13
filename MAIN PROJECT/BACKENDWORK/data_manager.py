@@ -15,7 +15,7 @@ def get_connection():
 
 
 def initialize_database():
-    """Tạo bảng users nếu chưa tồn tại"""
+    """Tạo bảng users và default_posts nếu chưa tồn tại"""
     try:
         conn = get_connection()
         cursor = conn.cursor()
@@ -26,6 +26,16 @@ def initialize_database():
                 password TEXT NOT NULL,
                 phone TEXT,
                 email TEXT
+            )
+        ''')
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS default_posts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                description TEXT NOT NULL,
+                image_path TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
         
@@ -163,3 +173,47 @@ def change_password(username, current_password, new_password):
         
     except Exception as e:
         return False, f"Lỗi hệ thống: {e}"
+
+
+def add_default_post(title, description, image_path):
+    """Thêm bài viết mặc định với mô tả và ảnh"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO default_posts (title, description, image_path) VALUES (?, ?, ?)",
+            (title, description, image_path)
+        )
+        conn.commit()
+        conn.close()
+        return True, "Thêm bài viết thành công!"
+    except Exception as e:
+        return False, f"Lỗi khi thêm bài viết: {e}"
+
+
+def get_all_default_posts():
+    """Lấy tất cả bài viết mặc định"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM default_posts ORDER BY created_at DESC")
+        posts = cursor.fetchall()
+        conn.close()
+        return [dict(post) for post in posts]
+    except Exception as e:
+        print(f"--- LỖI get_all_default_posts: {e} ---")
+        return []
+
+
+def get_default_post_by_id(post_id):
+    """Lấy bài viết mặc định theo ID"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM default_posts WHERE id = ?", (post_id,))
+        post = cursor.fetchone()
+        conn.close()
+        return dict(post) if post else None
+    except Exception as e:
+        print(f"--- LỖI get_default_post_by_id: {e} ---")
+        return None
