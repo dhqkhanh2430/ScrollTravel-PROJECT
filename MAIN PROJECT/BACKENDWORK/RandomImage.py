@@ -25,4 +25,24 @@ def random_qpixmap(folder_name):
     filename = random.choice(images)
     full_path = os.path.join(folder_path, filename)
 
+def random_image_path(folder_name):
+    folder_path = os.path.join(ASSETS_IMAGES_DIR, folder_name)
+
+    if not os.path.isdir(folder_path):
+        return None
+
+    images = [
+        f for f in os.listdir(folder_path)
+        if f.lower().endswith((".png", ".jpg", ".jpeg"))
+    ]
+
+    if not images:
+        return None
+
+    filename = random.choice(images)
+    full_path = os.path.join(folder_path, filename)
+
+    return full_path
+
     return QPixmap(full_path)
+
