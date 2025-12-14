@@ -10,17 +10,18 @@ from PyQt5 import QtWidgets, uic, QtGui, QtCore
 from PyQt5.QtCore import QTimer, QStringListModel, Qt, QThread, pyqtSignal
 from PyQt5.QtCore import QPropertyAnimation, QEasingCurve, QEvent, QSize
 from PyQt5.QtWidgets import QMessageBox, QCompleter, QVBoxLayout, QPushButton
-from webmap import MapWidget
-from RandomImage import random_qpixmap
-from APIcall_Places import getPlaces
-from Categories_Input import Cate, SetCategories
-from Input_Classify import cityCheck
+
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 #Import mấy cái file cần cho cái đống ở dưới
 import res
 import data_manager
+from webmap import MapWidget
+from RandomImage import random_qpixmap
+from APIcall_Places import getPlaces
+from Categories_Input import Cate, SetCategories
+from Input_Classify import classify_location
 
 
 #Hàm hỗ trợ lấy đường dẫn UI
@@ -151,6 +152,81 @@ class MenuScreen(QtWidgets.QMainWindow):
             self.filterBtn.setChecked(False)
             #Kết nối sự kiện "toggled" (bật/tắt) thay vì "clicked"
             self.filterBtn.toggled.connect(self.handle_filter_toggle)
+
+        # Lấy danh sách category để pass qua searchResults
+        self.init_temp_filters()
+
+        if hasattr(self, 'searchBtn'):
+            self.searchBtn.clicked.connect(self.goto_results)
+
+    def init_temp_filters(self):
+        self.temp_filters = copy.deepcopy(Cate)
+
+    def update_temp_filter(self, group, name, checked):
+        self.temp_filters[group][name] = checked
+
+    def connect_filter_buttons(self):
+        # Entertainment
+        self.aquariumBtn.toggled.connect(lambda checked: self.update_temp_filter("Entertainment", "Aquarium", checked))
+        self.cinemaBtn.toggled.connect(lambda checked: self.update_temp_filter("Entertainment", "Cinema", checked))
+        self.cultureBtn.toggled.connect(lambda checked: self.update_temp_filter("Entertainment", "Culture", checked))
+        self.themeParkBtn.toggled.connect(lambda checked: self.update_temp_filter("Entertainment", "Theme_Park", checked))
+        self.waterParkBtn.toggled.connect(lambda checked: self.update_temp_filter("Entertainment", "Water_Park", checked))
+        self.zooBtn.toggled.connect(lambda checked: self.update_temp_filter("Entertainment", "Zoo", checked))
+        # Catering
+        self.restaurantBtn.toggled.connect(lambda checked: self.update_temp_filter("Catering", "Restaurant", checked))
+        self.cafeBtn.toggled.connect(lambda checked: self.update_temp_filter("Catering", "Cafe", checked))
+        self.barBtn.toggled.connect(lambda checked: self.update_temp_filter("Catering", "Bar", checked))
+        # Accommodation
+        self.hotelBtn.toggled.connect(lambda checked: self.update_temp_filter("Accommodation", "Hotel", checked))
+        self.motelBtn.toggled.connect(lambda checked: self.update_temp_filter("Accommodation", "Motel", checked))
+        # Commercial
+        self.supermarketBtn.toggled.connect(lambda checked: self.update_temp_filter("Commercial", "Supermarket", checked))
+
+    def reset_filters(self):
+        self.temp_filters = copy.deepcopy(Cate)
+
+        for btn in [
+            self.aquariumBtn, self.cinemaBtn, self.cultureBtn,
+            self.themeParkBtn, self.waterParkBtn, self.zooBtn,
+            self.restaurantBtn, self.cafeBtn, self.barBtn,
+            self.hotelBtn, self.motelBtn, self.supermarketBtn
+        ]:
+            btn.blockSignals(True)
+            btn.setChecked(False)
+            btn.blockSignals(False)
+        
+    def goto_results(self):
+        if self.current_user_data:
+            try:
+                username = self.current_user_data.get('Username', '')
+
+                cateInput = SetCategories(self.temp_filters)
+                if cateInput == []:
+                    QMessageBox.warning(self, "Cảnh báo", "Vui lòng chọn loại hình du lịch")
+                    return
+
+                locInput = self.searchINPUT.text().strip()
+                if not locInput:
+                    QMessageBox.warning(self, "Cảnh báo", "Vui lòng nhập tên thành phố")
+                    return
+                addr, loc_type, coords = classify_location(locInput)
+                if loc_type != "City/Town":
+                    QMessageBox.warning(self, "Cảnh báo", "Vui lòng điền một thành phố")
+                    return
+                
+                lat = coords.latitude
+                lon = coords.longitude
+                radius = "20000"
+                result = getPlaces(lat, lon, radius, cateInput)
+
+                searchResults_window.loadData(username, result)
+                widget.setCurrentIndex(5)
+                
+            except Exception as e:
+                QMessageBox.critical(self, "Lỗi", f"Không thể hiển thị kết quả: {e}")
+        else:
+            QMessageBox.warning(self, "Cảnh báo", "Vui lòng đăng nhập trước!")
 
     def load_user_info(self, user_data):
         self.current_user_data = user_data
