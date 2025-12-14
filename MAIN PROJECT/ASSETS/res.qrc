@@ -1,7 +1,17 @@
 <RCC>
   <qresource prefix="Login">
+    <file>logo.png</file>
     <file>background.jpg</file>
     <file>logo.png</file>
+  </qresource>
+  <qresource prefix="Menu">
+    <file>refresh-removebg-preview.png</file>
+    <file>refresh.jpg</file>
+    <file>Yeu thich icon.png</file>
+  </qresource>
+  <qresource prefix="Result">
+    <file>Yeu thich icon.png</file>
+    <file>home.png</file>
   </qresource>
   <qresource prefix="Profile">
     <file>oguricapP.jpg</file>

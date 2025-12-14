@@ -148,21 +148,20 @@ QPushButton#searchBtn:hover {
            <widget class="QPushButton" name="refreshBtn">
             <property name="minimumSize">
              <size>
-              <width>40</width>
-              <height>40</height>
+              <width>60</width>
+              <height>60</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>40</width>
-              <height>40</height>
+              <width>60</width>
+              <height>60</height>
              </size>
             </property>
             <property name="styleSheet">
              <string notr="true">QPushButton#refreshBtn{
 	border: 1px solid transparent;
-	font-size: 20px;
-	margin-right: 10px;
+	font-size: 10px
 }
 
 QPushButton#refreshBtn:hover {
@@ -172,7 +171,59 @@ QPushButton#refreshBtn:hover {
 }</string>
             </property>
             <property name="text">
-             <string>🔄</string>
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../ASSETS/res.qrc">
+              <normaloff>:/Menu/refresh-removebg-preview.png</normaloff>:/Menu/refresh-removebg-preview.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>50</width>
+              <height>50</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="favoriteBtn">
+            <property name="minimumSize">
+             <size>
+              <width>60</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>60</width>
+              <height>60</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">
+
+QPushButton#favoriteBtn{
+	border: 1px solid transparent;
+}
+
+QPushButton#favoriteBtn:hover {
+    border: 1px solid #00aaff;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../ASSETS/res.qrc">
+              <normaloff>:/Menu/Yeu thich icon.png</normaloff>:/Menu/Yeu thich icon.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>50</width>
+              <height>50</height>
+             </size>
             </property>
            </widget>
           </item>
