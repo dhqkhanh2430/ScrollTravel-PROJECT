@@ -6,6 +6,7 @@ import requests
 import urllib3
 import shutil
 import datetime
+import copy
 from PyQt5 import QtWidgets, uic, QtGui, QtCore
 from PyQt5.QtCore import QTimer, QStringListModel, Qt, QThread, pyqtSignal
 from PyQt5.QtCore import QPropertyAnimation, QEasingCurve, QEvent, QSize
@@ -155,9 +156,10 @@ class MenuScreen(QtWidgets.QMainWindow):
 
         # Lấy danh sách category để pass qua searchResults
         self.init_temp_filters()
-
+        self.connect_filter_buttons()
         if hasattr(self, 'searchBtn'):
             self.searchBtn.clicked.connect(self.goto_results)
+
 
     def init_temp_filters(self):
         self.temp_filters = copy.deepcopy(Cate)
@@ -214,11 +216,26 @@ class MenuScreen(QtWidgets.QMainWindow):
                 if loc_type != "City/Town":
                     QMessageBox.warning(self, "Cảnh báo", "Vui lòng điền một thành phố")
                     return
-                
-                lat = coords.latitude
-                lon = coords.longitude
+
+                if isinstance(coords, tuple):
+                    lat = coords[0]
+                    lon = coords[1]
+                else:
+                    #Phòng trường hợp nó trả về object thật (geopy location)
+                    lat = coords.latitude
+                    lon = coords.longitude
+
                 radius = "20000"
                 result = getPlaces(lat, lon, radius, cateInput)
+
+                if isinstance(result, str):
+                    QMessageBox.warning(self, "Thông báo từ API", result)
+                    return
+
+                #Debug: Kiểm tra xem ds có rỗng không
+                if not result:
+                    QMessageBox.information(self, "Thông báo", "Không tìm thấy địa điểm nào phù hợp!")
+                    return
 
                 searchResults_window.loadData(username, result)
                 widget.setCurrentIndex(5)
@@ -951,15 +968,14 @@ class SearchResults(QtWidgets.QMainWindow):
 
         item = self.data[index]
 
-        add_favorite_place(
-            self.current_username,
-            item.name,
-            item.addr,
-            item.lat,
-            item.lon,
-            None
-            # Hiện chưa lưu được hình ảnh
-        )
+        #add_favorite_place(
+            #self.current_username,
+            #item.name,
+            #item.addr,
+            #item.lat,
+            #item.lon,
+            #None
+            #Hiện chưa lưu được hình ảnh
 
     def loadData(self, username, data):
         self.current_username = username
