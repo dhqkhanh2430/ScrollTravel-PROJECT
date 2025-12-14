@@ -11,6 +11,7 @@ from PyQt5 import QtWidgets, uic, QtGui, QtCore
 from PyQt5.QtCore import QTimer, QStringListModel, Qt, QThread, pyqtSignal
 from PyQt5.QtCore import QPropertyAnimation, QEasingCurve, QEvent, QSize
 from PyQt5.QtWidgets import QMessageBox, QCompleter, QVBoxLayout, QPushButton
+from PyQt5.QtGui import QPixmap
 
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -19,10 +20,11 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import res
 import data_manager
 from webmap import MapWidget
-from RandomImage import random_qpixmap
+from RandomImage import random_qpixmap, random_image_path
 from APIcall_Places import getPlaces
 from Categories_Input import Cate, SetCategories
 from Input_Classify import classify_location
+from add_favorite_places import add_favorite_place
 
 
 #Hàm hỗ trợ lấy đường dẫn UI
@@ -981,15 +983,7 @@ class SearchResults(QtWidgets.QMainWindow):
             return
 
         item = self.data[index]
-
-        #add_favorite_place(
-            #self.current_username,
-            #item.name,
-            #item.addr,
-            #item.lat,
-            #item.lon,
-            #None
-            #Hiện chưa lưu được hình ảnh
+        add_favorite_place(self.current_username,item.name,item.addr,item.lat,item.lon,random_image_path(item.category))
 
     def loadData(self, username, data):
         self.current_username = username
@@ -1011,7 +1005,7 @@ class SearchResults(QtWidgets.QMainWindow):
                 addr_lbl, img_lbl, name_lbl, cate_lbl = label_sets[i]
 
                 addr_lbl.setText(item.addr)
-                img_lbl.setPixmap(random_qpixmap(item.category))
+                img_lbl.setPixmap(QPixmap(random_image_path(item.category)))
                 name_lbl.setText(item.name)
                 cate_lbl.setText(item.category)
 
