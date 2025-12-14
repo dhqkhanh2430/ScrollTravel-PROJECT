@@ -53,7 +53,7 @@ def getPlaces(lat, lon, radius, categories):
     f"categories={categories}&"
     f"filter=circle:{lon},{lat},{radius}&"      #Cái API gọi bằng kinh độ rồi vĩ đồ
     f"bias=proximity:{lon},{lat}&"              #Trong gg map hiển thị vĩ độ rồi kinh độ =)))
-    f"limit=5&apiKey={API_KEY2}"
+    f"limit=6&apiKey={API_KEY2}"
 )
 
     try:
@@ -83,3 +83,4 @@ def getPlaces(lat, lon, radius, categories):
     except KeyError:
 
         return "Resp struct Error"
+
