@@ -13,8 +13,6 @@ class Location_Components:
 
         elif "catering.bar" in category:
             self.category = "Catering.Bar"
-        elif "catering.bar" in category:
-            self.category = "Catering.Bar"
         elif "catering.cafe" in category:
             self.category = "Catering.Cafe"
         elif "catering.restaurant" in category:
@@ -25,6 +23,8 @@ class Location_Components:
         elif "commercial.supermarket" in category:
             self.category = "Commercial.Supermarket"
 
+        elif "entertainment.culture" in category:
+            self.category = "Entertainment.Culture"
         elif "entertainment.aquarium" in category:
             self.category = "Entertainment.Aquarium"
         elif "entertainment.cinema" in category:
@@ -40,3 +40,4 @@ class Location_Components:
 
         else:
             self.category = "Unknown"
+
