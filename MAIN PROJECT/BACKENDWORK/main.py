@@ -204,6 +204,10 @@ class MenuScreen(QtWidgets.QMainWindow):
                 username = self.current_user_data.get('Username', '')
 
                 cateInput = SetCategories(self.temp_filters)
+                if not cateInput:
+                    #Gán mặc định là hotel
+                    cateInput = "accommodation.hotel"
+                    print("Người dùng không chọn gì -> Mặc định tìm Hotel")
                 if cateInput == []:
                     QMessageBox.warning(self, "Cảnh báo", "Vui lòng chọn loại hình du lịch")
                     return
@@ -213,8 +217,10 @@ class MenuScreen(QtWidgets.QMainWindow):
                     QMessageBox.warning(self, "Cảnh báo", "Vui lòng nhập tên thành phố")
                     return
                 addr, loc_type, coords = classify_location(locInput)
-                if loc_type != "City/Town":
-                    QMessageBox.warning(self, "Cảnh báo", "Vui lòng điền một thành phố")
+
+                if not coords:
+                    QMessageBox.warning(self, "Không tìm thấy",
+                                        f"Không tìm thấy địa điểm: {locInput}\nVui lòng kiểm tra lại chính tả.")
                     return
 
                 if isinstance(coords, tuple):
@@ -955,12 +961,11 @@ class SearchResults(QtWidgets.QMainWindow):
                 frame.setCursor(QtCore.Qt.PointingHandCursor)
                 frame.setAttribute(QtCore.Qt.WA_StyledBackground, True)
 
-        #-----------------Nút về menu------------------------
         if hasattr(self, 'homeButton'):
              self.homeButton.clicked.connect(self.goto_menu)
 
     def goto_menu(self):
-        widget.setCurrentIndex(2)
+        widget.setCurrentIndex(3)
 
     def on_favorite_clicked(self, index):
         if index >= len(self.data):

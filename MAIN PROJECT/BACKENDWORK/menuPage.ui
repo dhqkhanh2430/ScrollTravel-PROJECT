@@ -112,7 +112,7 @@ QLineEdit::placeholderText{
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
             </property>
             <property name="placeholderText">
-             <string notr="true">Tìm kiếm địa điểm...</string>
+             <string notr="true">Tìm kiếm địa điểm... (mặc định là tìm kiếm khách sạn)</string>
             </property>
            </widget>
           </item>
@@ -219,6 +219,33 @@ QPushButton#profileBtn:hover {
            </widget>
           </item>
          </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="reminderLbl">
+         <property name="minimumSize">
+          <size>
+           <width>400</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>400</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel#reminderLbl{
+	 font-family: &quot;Segoe UI&quot;, sans-serif;
+   	 font-size: 18px;
+	color: red;
+	margin-left: 5px;
+}</string>
+         </property>
+         <property name="text">
+          <string>Nhớ chọn loại địa điểm bạn nhé!</string>
+         </property>
         </widget>
        </item>
        <item>
