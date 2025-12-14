@@ -9,7 +9,12 @@ import datetime
 from PyQt5 import QtWidgets, uic, QtGui, QtCore
 from PyQt5.QtCore import QTimer, QStringListModel, Qt, QThread, pyqtSignal
 from PyQt5.QtCore import QPropertyAnimation, QEasingCurve, QEvent, QSize
-from PyQt5.QtWidgets import QMessageBox, QCompleter
+from PyQt5.QtWidgets import QMessageBox, QCompleter, QVBoxLayout, QPushButton
+from webmap import MapWidget
+from RandomImage import random_qpixmap
+from APIcall_Places import getPlaces
+from Categories_Input import Cate, SetCategories
+from Input_Classify import cityCheck
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -729,7 +734,7 @@ class LoginScreen(QtWidgets.QMainWindow):
         widget.setCurrentIndex(1)
 
 
-#Claas Register
+#Class Register
 class RegisterScreen(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -806,6 +811,137 @@ class RegisterScreen(QtWidgets.QMainWindow):
         widget.setCurrentIndex(0)
 
 
+#class kết quả trang tìm kiếm
+class SearchResults(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        try:
+            uic.loadUi(get_ui_path("searchResults.ui"), self)
+        except FileNotFoundError:
+            print("Lỗi: Không tìm thấy searchResults.ui")
+
+        #------------------Nút yêu thích-----------------
+        self._favorite_buttons = [
+            self.favoriteButton,
+            self.favoriteButton_2,
+            self.favoriteButton_3,
+            self.favoriteButton_4,
+            self.favoriteButton_5,
+            self.favoriteButton_6,
+        ]
+
+        for index, btn in enumerate(self._favorite_buttons):
+            btn.clicked.connect(
+                lambda checked=False, i=index: self.on_favorite_clicked(i)
+            )
+
+        # ---------------- setup cái minimap ----------------
+        self.map_widget = MapWidget()
+        map_layout = QVBoxLayout(self.frame)
+        map_layout.setContentsMargins(0, 0, 0, 0)
+        map_layout.addWidget(self.map_widget)
+        self.map_widget.load_coordinates(10.775, 106.700, popup_text="Default")
+
+        # ---------------- biến giữ dữ liệu: username & danh sách kết quả tìm kiếm ----------------
+        self.data = []
+        self.current_username = None
+
+        # ---------------- Khiến những ô chứa bấm được ----------------
+        self._frames = [
+            self.framBox,
+            self.frameBox_2,
+            self.frameBox_3,
+            self.frameBox_4,
+            self.frameBox_5,
+            self.frameBox_6,
+        ]
+
+        for frame in self._frames:
+                self._install_click_filter(frame)
+                frame.setCursor(QtCore.Qt.PointingHandCursor)
+                frame.setAttribute(QtCore.Qt.WA_StyledBackground, True)
+
+        #-----------------Nút về menu------------------------
+        if hasattr(self, 'homeButton'):
+             self.homeButton.clicked.connect(self.goto_menu)
+
+    def goto_menu(self):
+        widget.setCurrentIndex(2)
+
+    def on_favorite_clicked(self, index):
+        if index >= len(self.data):
+            return
+
+        item = self.data[index]
+
+        add_favorite_place(
+            self.current_username,
+            item.name,
+            item.addr,
+            item.lat,
+            item.lon,
+            None
+            # Hiện chưa lưu được hình ảnh
+        )
+
+    def loadData(self, username, data):
+        self.current_username = username
+        self.data = data
+        
+        label_sets = [
+                (self.addrLabel,   self.imageLabel,   self.nameLabel,   self.categoryLabel),
+                (self.addrLabel_2, self.imageLabel_2, self.nameLabel_2, self.categoryLabel_2),
+                (self.addrLabel_3, self.imageLabel_3, self.nameLabel_3, self.categoryLabel_3),
+                (self.addrLabel_4, self.imageLabel_4, self.nameLabel_4, self.categoryLabel_4),
+                (self.addrLabel_5, self.imageLabel_5, self.nameLabel_5, self.categoryLabel_5),
+                (self.addrLabel_6, self.imageLabel_6, self.nameLabel_6, self.categoryLabel_6),
+        ]
+
+        count = min(len(self.data), len(label_sets))
+
+        for i in range(count):
+                item = self.data[i]
+                addr_lbl, img_lbl, name_lbl, cate_lbl = label_sets[i]
+
+                addr_lbl.setText(item.addr)
+                img_lbl.setPixmap(random_qpixmap(item.category))
+                name_lbl.setText(item.name)
+                cate_lbl.setText(item.category)
+
+    def _install_click_filter(self, widget):
+        # Install the filter on the widget and recursively on its children so clicks
+        # on labels/images inside the frame are also caught.
+        widget.installEventFilter(self)
+        for child in widget.findChildren(QtWidgets.QWidget):
+            child.installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        # Only handle mouse-press events here 
+        if event.type() == QEvent.MouseButtonPress:
+
+            if isinstance(obj, QPushButton):
+                return False
+            
+            for index, frame in enumerate(self._frames):
+                
+                if obj is frame or frame.isAncestorOf(obj):
+                
+                    if index >= len(self.data):
+                        return True
+
+                    item = self.data[index]
+                
+                    self.map_widget.load_coordinates(
+                        item.lat,
+                        item.lon,
+                        popup_text=item.name
+                    )
+                    return True 
+
+        return super().eventFilter(obj, event)
+
+    
 #Chương trình chính để khởi tạo index, khởi tạo object, căn chỉnh cửa sổ vân vân mây mây
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
@@ -816,12 +952,13 @@ if __name__ == "__main__":
     #Import FavoritePlacesWindow
     from add_favorite_places import FavoritePlacesWindow
 
-    #Khởi tạo 5 màn hình
-    login_window = LoginScreen()  # Index 0
-    register_window = RegisterScreen()  # Index 1
-    profile_window = ProfileScreen()  # Index 2
-    menu_window = MenuScreen()  # Index 3
-    favorite_window = FavoritePlacesWindow("")  # Index 4
+    #Khởi tạo 6 màn hình
+    login_window = LoginScreen()                  # Index 0
+    register_window = RegisterScreen()            # Index 1
+    profile_window = ProfileScreen()              # Index 2
+    menu_window = MenuScreen()                    # Index 3
+    favorite_window = FavoritePlacesWindow("")    # Index 4
+    searchResults_window = SearchResults()        # Index 5
 
     #Thêm vào Stack
     widget.addWidget(login_window)
@@ -829,6 +966,7 @@ if __name__ == "__main__":
     widget.addWidget(profile_window)
     widget.addWidget(menu_window)
     widget.addWidget(favorite_window)
+    widget.addWidget(searchResults_window)
 
     #Cấu hình cửa sổ
     widget.resize(860, 540)
