@@ -6,8 +6,9 @@ import requests
 import urllib3
 import shutil
 import datetime
-from PyQt5 import QtWidgets, uic, QtGui
+from PyQt5 import QtWidgets, uic, QtGui, QtCore
 from PyQt5.QtCore import QTimer, QStringListModel, Qt, QThread, pyqtSignal
+from PyQt5.QtCore import QPropertyAnimation, QEasingCurve, QEvent, QSize
 from PyQt5.QtWidgets import QMessageBox, QCompleter
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -130,6 +131,21 @@ class MenuScreen(QtWidgets.QMainWindow):
         self.search_timer.setSingleShot(True)
         self.search_timer.setInterval(300)  # Giảm xuống 300ms cho mượt
         self.search_timer.timeout.connect(self.start_api_thread)  # Gọi hàm start thread
+
+        if hasattr(self, 'filterContainer'):
+            #1. Ẩn container đi lúc đầu
+            self.filterContainer.setMinimumHeight(0)
+            self.filterContainer.setMaximumHeight(0)
+            #2. Chỉnh chiều cao bung ra (bạn nhìn ảnh ước lượng, khoảng 200-250px là đẹp)
+            self.target_filter_height = 250
+
+        if hasattr(self, 'filterBtn'):
+            #Đảm bảo code hiểu đây là nút checkable (dù Designer chỉnh rồi thì thêm dòng này cho chắc)
+            self.filterBtn.setCheckable(True)
+            #Nếu nút đang lún xuống thì nhả nó ra (để đồng bộ với việc container đang đóng)
+            self.filterBtn.setChecked(False)
+            #Kết nối sự kiện "toggled" (bật/tắt) thay vì "clicked"
+            self.filterBtn.toggled.connect(self.handle_filter_toggle)
 
     def load_user_info(self, user_data):
         self.current_user_data = user_data
@@ -337,7 +353,7 @@ class MenuScreen(QtWidgets.QMainWindow):
         return frame
     #Xóa bài viết
     def handle_delete_post(self, post_id, image_rel_path):
-        # 1. Hỏi xác nhận
+        #1. Hỏi xác nhận
         reply = QMessageBox.question(
             self, "Xác nhận xóa",
             "Bạn có chắc chắn muốn xóa bài viết này không?\nHành động này không thể hoàn tác.",
@@ -365,6 +381,25 @@ class MenuScreen(QtWidgets.QMainWindow):
                 self.load_default_posts()  #Load lại danh sách
             else:
                 QMessageBox.critical(self, "Lỗi", msg)
+    #Xử lý đóng mở filter
+    def handle_filter_toggle(self, checked):
+        if not hasattr(self, 'filterContainer'): return
+
+        #Tạo hiệu ứng Animation cho mượt
+        self.anim = QPropertyAnimation(self.filterContainer, b"maximumHeight")
+        self.anim.setDuration(300)
+        self.anim.setEasingCurve(QEasingCurve.InOutQuad)
+
+        if checked:
+            #Nếu nút BẬT -> Mở ra đến chiều cao đã định
+            self.anim.setStartValue(0)
+            self.anim.setEndValue(self.target_filter_height)
+        else:
+            #Nếu nút TẮT -> Thu về 0
+            self.anim.setStartValue(self.target_filter_height)
+            self.anim.setEndValue(0)
+
+        self.anim.start()
 
 
 # Class Worker chạy ngầm gọi API
