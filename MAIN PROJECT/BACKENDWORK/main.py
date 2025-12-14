@@ -29,8 +29,19 @@ from add_favorite_places import add_favorite_place
 
 #Hàm hỗ trợ lấy đường dẫn UI
 def get_ui_path(filename):
-    return os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
+    if getattr(sys, 'frozen', False):
+        #Nếu là file exe (PyInstaller)
+        #Dùng sys._MEIPASS để trỏ vào thư mục resource đã giải nén (_internal)
+        if hasattr(sys, '_MEIPASS'):
+            base_path = sys._MEIPASS
+        else:
+            #Fallback nếu không tìm thấy _MEIPASS, trỏ vào thư mục chứa exe
+            base_path = os.path.dirname(sys.executable)
+    else:
+        #Nếu đang chạy code Python bình thường
+        base_path = os.path.dirname(os.path.abspath(__file__))
 
+    return os.path.join(base_path, filename)
 
 #Class đổi mật khẩu
 class ChangePasswordWindow(QtWidgets.QMainWindow):
@@ -55,6 +66,39 @@ class ChangePasswordWindow(QtWidgets.QMainWindow):
             self.goBackBtn.clicked.connect(self.close)
         elif hasattr(self, 'backBtn'):
             self.backBtn.clicked.connect(self.close)
+
+        password_fields = ['currentPasswordInput', 'newPasswordInput', 'retypeNewPasswordInput']\
+        #vòng lặp để set chế độ ẩn
+        for field_name in password_fields:
+            if hasattr(self, field_name):
+                getattr(self, field_name).setEchoMode(QtWidgets.QLineEdit.Password)
+
+        if hasattr(self, 'showPass'):
+            self.showPass.setCheckable(True)
+            self.showPass.setChecked(False) 
+            self.showPass.clicked.connect(self.toggle_change_password)
+
+    def toggle_change_password(self):
+        try:
+            password_fields = ['currentPasswordInput', 'newPasswordInput', 'retypeNewPasswordInput']
+            first_field = getattr(self, 'currentPasswordInput', None)
+
+            if first_field and first_field.echoMode() == QtWidgets.QLineEdit.Password:
+                mode = QtWidgets.QLineEdit.Normal
+                icon_text = "👁"
+            else:
+                mode = QtWidgets.QLineEdit.Password
+                icon_text = "🙈"
+            if hasattr(self, 'showPass'):
+                self.showPass.setText(icon_text)
+
+            #Áp dụng chế độ cho cả 3 ô
+            for field_name in password_fields:
+                if hasattr(self, field_name):
+                    getattr(self, field_name).setEchoMode(mode)
+
+        except Exception as e:
+            print(f"Lỗi toggle password: {e}")
 
     def handle_change_password(self):
         try:
@@ -852,6 +896,43 @@ class RegisterScreen(QtWidgets.QMainWindow):
             uic.loadUi(get_ui_path("registerPage.ui"), self)
         except FileNotFoundError:
             print("Lỗi: Không tìm thấy file registerPage.ui")
+        try:
+            if hasattr(self, 'showPass'):
+                self.showPass.clicked.connect(self.toggle_register_password)
+                self.showPass.setText("🙈")
+
+        except AttributeError:
+            print("Chưa có nút showPass")
+
+        if hasattr(self, 'passwordINPUT'):
+            self.passwordINPUT.setEchoMode(QtWidgets.QLineEdit.Password)
+        if hasattr(self, 'retypePasswordInput'):
+            self.retypePasswordInput.setEchoMode(QtWidgets.QLineEdit.Password)
+
+    def toggle_register_password(self):
+        try:
+            if self.passwordINPUT.echoMode() == QtWidgets.QLineEdit.Password:
+                mode = QtWidgets.QLineEdit.Normal
+                icon_text = "👁"
+            else:
+                mode = QtWidgets.QLineEdit.Password
+                icon_text = "🙈"
+            if hasattr(self, 'showPass'):
+                self.showPass.setText(icon_text)
+            if hasattr(self, 'passwordINPUT'):
+                self.passwordINPUT.setEchoMode(mode)
+            if hasattr(self, 'retypePasswordInput'):
+                self.retypePasswordInput.setEchoMode(mode)
+        except Exception as e:
+            print(f"Lỗi toggle password: {e}")
+        except AttributeError:
+            pass
+
+        # Áp dụng cho cả 2 ô
+        if hasattr(self, 'passwordINPUT'):
+            self.passwordINPUT.setEchoMode(mode)
+        if hasattr(self, 'retypePasswordInput'):
+            self.retypePasswordInput.setEchoMode(mode)
 
         #Nút đăng ký
         self.registerBUTTON.clicked.connect(self.handle_registration)
