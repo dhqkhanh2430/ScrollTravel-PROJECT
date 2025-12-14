@@ -129,14 +129,14 @@ class MenuScreen(QtWidgets.QMainWindow):
         #Timer Debounce
         self.search_timer = QTimer()
         self.search_timer.setSingleShot(True)
-        self.search_timer.setInterval(300)  # Giảm xuống 300ms cho mượt
-        self.search_timer.timeout.connect(self.start_api_thread)  # Gọi hàm start thread
+        self.search_timer.setInterval(300)
+        self.search_timer.timeout.connect(self.start_api_thread)  #Gọi hàm start thread
 
         if hasattr(self, 'filterContainer'):
             #1. Ẩn container đi lúc đầu
             self.filterContainer.setMinimumHeight(0)
             self.filterContainer.setMaximumHeight(0)
-            #2. Chỉnh chiều cao bung ra (bạn nhìn ảnh ước lượng, khoảng 200-250px là đẹp)
+            #2. Chỉnh chiều cao bung ra
             self.target_filter_height = 250
 
         if hasattr(self, 'filterBtn'):
