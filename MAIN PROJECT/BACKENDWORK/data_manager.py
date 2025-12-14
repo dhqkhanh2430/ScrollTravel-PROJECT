@@ -4,9 +4,6 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_NAME = os.path.join(BASE_DIR, "users.db")
 
-print(f"--- DEBUG: Database SQLite sẽ được lưu tại: {DB_NAME} ---")
-
-
 def get_connection():
     """Tạo kết nối đến database SQLite"""
     conn = sqlite3.connect(DB_NAME)
@@ -41,7 +38,6 @@ def initialize_database():
         
         conn.commit()
         conn.close()
-        print("--- DEBUG: Database đã sẵn sàng ---")
     except Exception as e:
         print(f"--- LỖI: Không thể khởi tạo database: {e} ---")
 

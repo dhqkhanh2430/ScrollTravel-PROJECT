@@ -7,10 +7,6 @@ from data_manager import get_connection, DB_NAME
 # Đường dẫn thư mục lưu ảnh địa điểm yêu thích
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FAVORITE_PLACES_DIR = os.path.join(BASE_DIR, "..", "ASSETS", "addToFavoritePlaces")
-
-print(f"--- DEBUG: Thư mục ảnh yêu thích: {FAVORITE_PLACES_DIR} ---")
-
-
 def initialize_favorite_places_table():
     """Tạo bảng favorite_places nếu chưa tồn tại"""
     try:
@@ -31,12 +27,8 @@ def initialize_favorite_places_table():
         ''')
         conn.commit()
         conn.close()
-        print("--- DEBUG: Bảng favorite_places đã sẵn sàng ---")
     except Exception as e:
         print(f"--- LỖI: Không thể tạo bảng favorite_places: {e} ---")
-
-
-# Khởi tạo bảng khi module được import
 initialize_favorite_places_table()
 
 
@@ -149,7 +141,6 @@ def check_favorite_place_exists(user_id, title, latitude, longitude):
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        # Kiểm tra dựa vào tọa độ với độ chính xác 0.0001 độ (~11m)
         cursor.execute('''
             SELECT id FROM favorite_places 
             WHERE user_id = ? 

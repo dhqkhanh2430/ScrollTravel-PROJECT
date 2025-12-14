@@ -1,9 +1,10 @@
 class Location_Components:
-    def __init__(self, name, addr, category, lat, lon):
+    def __init__(self, name, addr, category, lat, lon, place_id=None):
         self.name = name
         self.addr = addr
         self.lat = lat
         self.lon = lon
+        self.place_id = place_id  # Thêm place_id để lấy ảnh
 
         if "accommodation.hotel" in category:
             self.category = "Accommodation.Hotel"

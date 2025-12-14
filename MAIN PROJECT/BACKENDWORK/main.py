@@ -785,6 +785,15 @@ class LoginScreen(QtWidgets.QMainWindow):
         except AttributeError:
             print("Không có nút loginBt")
 
+        #Cho phép nhấn Enter để đăng nhập
+        try:
+            if hasattr(self, 'username'):
+                self.username.returnPressed.connect(self.handle_login)
+            if hasattr(self, 'password'):
+                self.password.returnPressed.connect(self.handle_login)
+        except AttributeError:
+            print("Không thể kết nối Enter key")
+
         try:
             if hasattr(self, 'showPasswordBt'):
                 self.showPasswordBt.clicked.connect(self.toggle_password)
