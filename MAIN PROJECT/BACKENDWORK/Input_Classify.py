@@ -30,13 +30,4 @@ def classify_location(query):
     return location.address, loc_type, (location.latitude, location.longitude)
 
 
-def cityCheck(query):
-    loc_query = query.strip()
-    name, loc_type, coords = classify_location(loc_query)
-    if name:
-        if loc_type == "City/Town":
-            lat, lon = coords
-            return lat, lon
-    else:
-        return 0, 0
     

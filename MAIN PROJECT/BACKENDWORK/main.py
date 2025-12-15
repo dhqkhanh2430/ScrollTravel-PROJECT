@@ -1028,17 +1028,15 @@ class SearchResults(QtWidgets.QMainWindow):
             btn.clicked.connect(
                 lambda checked=False, i=index: self.on_favorite_clicked(i)
             )
+        # ---------------- biến giữ dữ liệu: username & danh sách kết quả tìm kiếm ----------------
+        self.data = []
+        self.current_username = None
 
         # ---------------- setup cái minimap ----------------
         self.map_widget = MapWidget()
         map_layout = QVBoxLayout(self.frame)
         map_layout.setContentsMargins(0, 0, 0, 0)
         map_layout.addWidget(self.map_widget)
-        self.map_widget.load_coordinates(10.775, 106.700, popup_text="Default")
-
-        # ---------------- biến giữ dữ liệu: username & danh sách kết quả tìm kiếm ----------------
-        self.data = []
-        self.current_username = None
 
         # ---------------- Khiến những ô chứa bấm được ----------------
         self._frames = [
@@ -1091,6 +1089,8 @@ class SearchResults(QtWidgets.QMainWindow):
                 img_lbl.setPixmap(QPixmap(random_image_path(item.category)))
                 name_lbl.setText(item.name)
                 cate_lbl.setText(item.category)
+
+        self.map_widget.load_coordinates(self.data[0].lat, self.data[0].lon, popup_text="Default")
 
     def _install_click_filter(self, widget):
         # Install the filter on the widget and recursively on its children so clicks
