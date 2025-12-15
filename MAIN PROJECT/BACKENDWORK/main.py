@@ -1,7 +1,6 @@
 import sys
 import os
 import re
-import time
 import requests
 import urllib3
 import shutil
@@ -9,7 +8,7 @@ import datetime
 import copy
 from PyQt5 import QtWidgets, uic, QtGui, QtCore
 from PyQt5.QtCore import QTimer, QStringListModel, Qt, QThread, pyqtSignal
-from PyQt5.QtCore import QPropertyAnimation, QEasingCurve, QEvent, QSize
+from PyQt5.QtCore import QPropertyAnimation, QEasingCurve, QEvent
 from PyQt5.QtWidgets import QMessageBox, QCompleter, QVBoxLayout, QPushButton
 from PyQt5.QtGui import QPixmap
 
@@ -20,7 +19,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import res
 import data_manager
 from webmap import MapWidget
-from RandomImage import random_qpixmap, random_image_path
+from RandomImage import random_image_path
 from APIcall_Places import getPlaces
 from Categories_Input import Cate, SetCategories
 from Input_Classify import classify_location
@@ -900,6 +899,13 @@ class RegisterScreen(QtWidgets.QMainWindow):
             if hasattr(self, 'showPass'):
                 self.showPass.clicked.connect(self.toggle_register_password)
                 self.showPass.setText("🙈")
+        except:
+            pass
+        # Nút quay lại trang login
+        try:
+            self.toLoginBt.clicked.connect(self.goto_login)
+        except AttributeError:
+            print("Lỗi UI: Không tìm thấy nút quay lại 'toLoginBt'.")
 
         except AttributeError:
             print("Chưa có nút showPass")
@@ -936,11 +942,7 @@ class RegisterScreen(QtWidgets.QMainWindow):
 
         #Nút đăng ký
         self.registerBUTTON.clicked.connect(self.handle_registration)
-        #Nút quay lại trang login
-        try:
-            self.toLoginBt.clicked.connect(self.goto_login)
-        except AttributeError:
-            print("Lỗi UI: Không tìm thấy nút quay lại 'toLoginBt'.")
+
 
     def handle_registration(self):
         try:
